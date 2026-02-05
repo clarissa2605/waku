@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\User;
+
 
 class AuthenticatedSessionController extends Controller
 {
@@ -22,14 +24,24 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
-    {
-        $request->authenticate();
+ public function store(LoginRequest $request): RedirectResponse
+{
+    $request->authenticate();
 
-        $request->session()->regenerate();
+    $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
-    }
+    /** @var User $user */
+    $user = Auth::user();
+
+
+    return match ($user->role) {
+        'admin'   => redirect()->to('/admin/dashboard'),
+        'pegawai' => redirect()->to('/pegawai/dashboard'),
+        'viewer'  => redirect()->to('/viewer/dashboard'),
+        default   => redirect('/login'),
+    };
+}
+
 
     /**
      * Destroy an authenticated session.
