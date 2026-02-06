@@ -13,7 +13,7 @@ class RoleMiddleware
         if (!Auth::check()) {
             abort(403, 'Unauthorized');
         }
-
+        
         if (!in_array(Auth::user()->role, $roles)) {
             abort(403, 'Forbidden');
         }
