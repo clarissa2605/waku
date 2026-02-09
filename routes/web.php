@@ -57,6 +57,19 @@ Route::middleware(['auth', 'role:viewer'])->group(function () {
 */
 require __DIR__.'/auth.php';
 
+Route::middleware(['auth', 'role:admin'])->group(function () {
+
+    Route::resource('pegawai', PegawaiController::class);
+
+    // 🔥 TAMBAHKAN INI
+    Route::get('/admin/pegawai/{id}/user', [PegawaiController::class, 'createUser'])
+        ->name('pegawai.user.create');
+
+    Route::post('/admin/pegawai/{id}/user', [PegawaiController::class, 'storeUser'])
+        ->name('pegawai.user.store');
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | FORCE LOGOUT (DEV ONLY)
@@ -77,6 +90,8 @@ Route::get('/whoami', function () {
 
     return 'NOT LOGGED IN';
 });
+
+
 
 
 

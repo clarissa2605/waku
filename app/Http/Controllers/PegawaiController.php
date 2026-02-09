@@ -3,64 +3,123 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pegawai;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PegawaiController extends Controller
 {
-    public function index()
+    /* =====================================================
+     |  CRUD DATA PEGAWAI
+     ===================================================== */
+
+    public function index(): View
     {
-        $pegawai = Pegawai::all();
-        return view('pegawai.index', compact('pegawai'));
+        $pegawai = Pegawai::where('status', 'aktif')
+            ->orderBy('nama')
+            ->get();
+
+        return view('admin_pegawai.index', compact('pegawai'));
     }
 
-    public function create()
+    public function create(): View
     {
-        return view('pegawai.create');
+        return view('admin_pegawai.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'nip' => 'required|unique:pegawai,nip',
-            'nama' => 'required',
-            'unit_kerja' => 'required',
-            'no_whatsapp' => 'required',
+            'nip'         => ['required', 'digits:18', 'unique:pegawai,nip'],
+            'nama'        => 'required|string|max:255',
+            'unit_kerja'  => 'required|string|max:255',
+            'no_whatsapp' => ['required', 'regex:/^[0-9]+$/', 'min:10', 'max:15'],
+            'status'      => 'required|in:aktif,nonaktif',
         ]);
 
-        Pegawai::create($request->all());
-
-        return redirect()->route('pegawai.index')
-            ->with('success', 'Data pegawai berhasil ditambahkan');
-    }
-
-    public function edit($id)
-    {
-        $pegawai = Pegawai::findOrFail($id);
-        return view('pegawai.edit', compact('pegawai'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $pegawai = Pegawai::findOrFail($id);
-
-        $request->validate([
-            'nama' => 'required',
-            'unit_kerja' => 'required',
+        Pegawai::create([
+            'nip'         => $request->nip,
+            'nama'        => $request->nama,
+            'unit_kerja'  => $request->unit_kerja,
+            'no_whatsapp' => $request->no_whatsapp,
+            'status'      => $request->status,
         ]);
 
-        $pegawai->update($request->except('no_whatsapp'));
+        return redirect()
+            ->route('pegawai.index')
+            ->with('success', 'Pegawai berhasil ditambahkan');
+    }
 
-        return redirect()->route('pegawai.index')
+    public function edit(int $id): View
+    {
+        $pegawai = Pegawai::findOrFail($id);
+        return view('admin_pegawai.edit', compact('pegawai'));
+    }
+
+    public function update(Request $request, int $id): RedirectResponse
+    {
+        $pegawai = Pegawai::findOrFail($id);
+
+        $validated = $request->validate([
+            'nama'       => 'required|string|max:255',
+            'unit_kerja' => 'required|string|max:255',
+            'status'     => 'required|in:aktif,nonaktif',
+        ]);
+
+        $pegawai->update($validated);
+
+        return redirect()
+            ->route('pegawai.index')
             ->with('success', 'Data pegawai berhasil diperbarui');
     }
 
-    public function destroy($id)
+    public function destroy(int $id): RedirectResponse
     {
         $pegawai = Pegawai::findOrFail($id);
-        $pegawai->status = 'nonaktif';
-        $pegawai->save();
+        $pegawai->update(['status' => 'nonaktif']);
 
-        return redirect()->route('pegawai.index')
+        return redirect()
+            ->route('pegawai.index')
             ->with('success', 'Pegawai dinonaktifkan');
+    }
+
+    /* =====================================================
+     |  AKUN LOGIN PEGAWAI
+     ===================================================== */
+
+    public function createUser(int $id): View|RedirectResponse
+    {
+        $pegawai = Pegawai::findOrFail($id);
+
+        if ($pegawai->user) {
+            return redirect()
+                ->back()
+                ->with('error', 'Pegawai sudah memiliki akun login');
+        }
+
+        return view('admin_pegawai.create_user', compact('pegawai'));
+    }
+
+    public function storeUser(Request $request, int $id): RedirectResponse
+    {
+        $pegawai = Pegawai::findOrFail($id);
+
+        $request->validate([
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ]);
+
+        User::create([
+            'name'       => $pegawai->nama,
+            'email'      => $request->email,
+            'password'   => Hash::make($request->password),
+            'pegawai_id' => $pegawai->id_pegawai,
+        ]);
+
+        return redirect()
+            ->route('pegawai.index')
+            ->with('success', 'Akun login pegawai berhasil dibuat');
     }
 }
