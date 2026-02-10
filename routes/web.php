@@ -96,6 +96,9 @@ Route::prefix('admin')
         Route::get('pencairan/import/confirm', function () {
             return redirect()->route('pencairan.import.form');
         });
+
+        Route::get('pencairan/{id}/preview-wa',[PencairanDanaController::class, 'previewPesanWA'])->name('pencairan.preview.wa');
+
     });
 
 
