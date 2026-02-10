@@ -3,11 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
 use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\PencairanDanaController;
 
 /*
 |--------------------------------------------------------------------------
-| Public
+| PUBLIC
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
@@ -16,17 +18,87 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN
+| ADMIN AREA
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return 'Dashboard Admin';
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | DASHBOARD
+        |--------------------------------------------------------------------------
+        */
+        Route::get('/dashboard', function () {
+            return 'Dashboard Admin';
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | CRUD PEGAWAI
+        |--------------------------------------------------------------------------
+        */
+        Route::resource('pegawai', PegawaiController::class);
+
+        // Akun login pegawai
+        Route::get('pegawai/{id}/user', [PegawaiController::class, 'createUser'])
+            ->name('pegawai.user.create');
+
+        Route::post('pegawai/{id}/user', [PegawaiController::class, 'storeUser'])
+            ->name('pegawai.user.store');
+
+        /*
+        |--------------------------------------------------------------------------
+        | PENCAIRAN DANA
+        |--------------------------------------------------------------------------
+        */
+
+        // List pencairan
+        Route::get('pencairan', [PencairanDanaController::class, 'index'])
+            ->name('pencairan.index');
+
+        // Form input individu
+        Route::get('pencairan/create', [PencairanDanaController::class, 'create'])
+            ->name('pencairan.create');
+
+        // Simpan pencairan individu
+        Route::post('pencairan', [PencairanDanaController::class, 'store'])
+            ->name('pencairan.store');
+
+        /*
+        |--------------------------------------------------------------------------
+        | IMPORT CSV PENCAIRAN
+        |--------------------------------------------------------------------------
+        */
+
+        // Form import
+        Route::get('pencairan/import', [PencairanDanaController::class, 'importForm'])
+            ->name('pencairan.import.form');
+
+        // Preview CSV
+        Route::post('pencairan/import/preview', [PencairanDanaController::class, 'importPreview'])
+            ->name('pencairan.import.preview');
+
+        // Konfirmasi & simpan hasil import
+        Route::post('pencairan/import/confirm', [PencairanDanaController::class, 'importConfirm'])
+            ->name('pencairan.import.confirm');
+        
+        // Preview CSV (POST)
+        Route::post('pencairan/import/preview', [PencairanDanaController::class, 'importPreview'])
+            ->name('pencairan.import.preview');
+
+        // Preview CSV (GET) → redirect agar tidak error 405
+        Route::get('pencairan/import/preview', function () {
+            return redirect()->route('pencairan.import.form');
+        });
+        // Konfirmasi & simpan hasil import (GET) → redirect agar tidak error 405
+        Route::get('pencairan/import/confirm', function () {
+            return redirect()->route('pencairan.import.form');
+        });
     });
 
-    // CRUD Pegawai (Admin only)
-    Route::resource('/admin/pegawai', PegawaiController::class);
-});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -52,27 +124,14 @@ Route::middleware(['auth', 'role:viewer'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| AUTH ROUTES (Laravel Breeze)
+| AUTH (Laravel Breeze)
 |--------------------------------------------------------------------------
 */
-require __DIR__.'/auth.php';
-
-Route::middleware(['auth', 'role:admin'])->group(function () {
-
-    Route::resource('pegawai', PegawaiController::class);
-
-    // 🔥 TAMBAHKAN INI
-    Route::get('/admin/pegawai/{id}/user', [PegawaiController::class, 'createUser'])
-        ->name('pegawai.user.create');
-
-    Route::post('/admin/pegawai/{id}/user', [PegawaiController::class, 'storeUser'])
-        ->name('pegawai.user.store');
-});
-
+require __DIR__ . '/auth.php';
 
 /*
 |--------------------------------------------------------------------------
-| FORCE LOGOUT (DEV ONLY)
+| DEV UTILITIES
 |--------------------------------------------------------------------------
 */
 Route::get('/force-logout', function (Request $request) {
@@ -84,14 +143,5 @@ Route::get('/force-logout', function (Request $request) {
 });
 
 Route::get('/whoami', function () {
-    if (Auth::check()) {
-        return Auth::user();
-    }
-
-    return 'NOT LOGGED IN';
+    return Auth::check() ? Auth::user() : 'NOT LOGGED IN';
 });
-
-
-
-
-
