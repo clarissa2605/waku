@@ -15,7 +15,6 @@ class Pegawai extends Model
         'nama',
         'unit_kerja',
         'no_whatsapp',
-        'mitra_id',
         'status',
 
     ];

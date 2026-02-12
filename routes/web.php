@@ -99,6 +99,11 @@ Route::prefix('admin')
 
         Route::get('pencairan/{id}/preview-wa',[PencairanDanaController::class, 'previewPesanWA'])->name('pencairan.preview.wa');
 
+        Route::get('admin/pencairan/{id}/kirim-wa', [PencairanDanaController::class, 'kirimWA'])->name('pencairan.kirim_wa');
+
+        Route::get('admin/pencairan/{id}/preview-wa',[PencairanDanaController::class, 'previewPesanWA'])->name('pencairan.preview_wa');
+
+
     });
 
 

@@ -25,8 +25,15 @@
         <label>Jenis Dana</label><br>
         <input type="text" name="jenis_dana"><br><br>
 
-        <label>Nominal</label><br>
-        <input type="number" name="nominal"><br><br>
+        <label>Nominal (Total)</label><br>
+        <input type="number" name="nominal" required>
+
+        <br><br>
+
+        <label>Potongan</label><br>
+        <input type="number" name="potongan" value="0" min="0">
+        <small>Isi 0 jika tidak ada potongan</small>
+
 
         <label>Tanggal</label><br>
         <input type="date" name="tanggal"><br><br>

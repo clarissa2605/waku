@@ -1,4 +1,14 @@
 <h1>Tambah Pegawai</h1>
+@if ($errors->any())
+    <div style="color:red; margin-bottom:15px;">
+        <strong>Terjadi kesalahan:</strong>
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
 <form action="{{ route('pegawai.store') }}" method="POST">
     @csrf

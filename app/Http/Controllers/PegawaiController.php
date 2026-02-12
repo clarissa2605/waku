@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Http\Controllers\Controller;
 
 class PegawaiController extends Controller
 {
@@ -29,28 +30,30 @@ class PegawaiController extends Controller
         return view('admin_pegawai.create');
     }
 
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'nip'         => ['required', 'digits:18', 'unique:pegawai,nip'],
-            'nama'        => 'required|string|max:255',
-            'unit_kerja'  => 'required|string|max:255',
-            'no_whatsapp' => ['required', 'regex:/^[0-9]+$/', 'min:10', 'max:15'],
-            'status'      => 'required|in:aktif,nonaktif',
-        ]);
+   public function store(Request $request): RedirectResponse
+{
+    $request->validate([
+        'nip'         => ['required', 'digits:18', 'unique:pegawai,nip'],
+        'nama'        => 'required|string|max:255',
+        'unit_kerja'  => 'required|string|max:255',
+        'no_whatsapp' => ['required','regex:/^62[0-9]{8,13}$/','min:10','max:15' ],
+        'status'      => 'required|in:aktif,nonaktif',], [
+        'no_whatsapp.regex' => 'Nomor WhatsApp harus diawali 62 dan tanpa spasi. Contoh: 628123456789',
+    ]);
 
-        Pegawai::create([
-            'nip'         => $request->nip,
-            'nama'        => $request->nama,
-            'unit_kerja'  => $request->unit_kerja,
-            'no_whatsapp' => $request->no_whatsapp,
-            'status'      => $request->status,
-        ]);
+    Pegawai::create([
+        'nip'            => $request->nip,
+        'nama'           => $request->nama,
+        'unit_kerja'     => $request->unit_kerja,
+        'no_whatsapp'    => $request->no_whatsapp, // FIXED
+        'status'         => $request->status,
+    ]);
 
-        return redirect()
-            ->route('pegawai.index')
-            ->with('success', 'Pegawai berhasil ditambahkan');
-    }
+    return redirect()
+        ->route('pegawai.index')
+        ->with('success', 'Pegawai berhasil ditambahkan');
+}
+
 
     public function edit(int $id): View
     {

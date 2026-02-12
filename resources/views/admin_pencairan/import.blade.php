@@ -26,6 +26,6 @@
         nip;tanggal;jenis_dana;nominal;keterangan<br><br>
 
         <i>Contoh:</i><br>
-        200104112022012067;10/02/2026;Honor Kegiatan;500000;Honor rapat
+        200104112022012067;2026-02-10;Honor Kegiatan;500000;Honor rapat
     </small>
 </p>

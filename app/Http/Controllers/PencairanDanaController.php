@@ -7,7 +7,8 @@ use App\Models\PencairanDana;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\WhatsAppTemplate;
-
+use App\Services\WhatsAppService; 
+use App\Http\Controllers\Controller;
 class PencairanDanaController extends Controller
 {
     /* =========================================================
@@ -39,14 +40,15 @@ class PencairanDanaController extends Controller
      * ========================================================= */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'pegawai_id' => 'required|exists:pegawai,id_pegawai',
-            'jenis_dana' => 'required|string|max:100',
-            'nominal'    => 'required|numeric|min:1',
-            'potongan'   => 'nullable|numeric|min:0',
-            'tanggal'    => 'required|date',
-            'keterangan' => 'nullable|string|max:255',
-        ]);
+    $validated = $request->validate([
+    'pegawai_id' => 'required|exists:pegawai,id_pegawai',
+    'jenis_dana' => 'required|string|max:100',
+    'nominal'    => 'required|numeric|min:1',
+    'potongan'   => 'nullable|numeric|min:0',
+    'tanggal'    => 'required|date',
+    'keterangan' => 'nullable|string|max:255',
+    ]);
+
 
         $pegawai = Pegawai::where('id_pegawai', $validated['pegawai_id'])
             ->where('status', 'aktif')
@@ -137,7 +139,7 @@ class PencairanDanaController extends Controller
     /* =========================================================
      * KONFIRMASI & SIMPAN HASIL IMPORT (TAMBAH POTONGAN & BERSIH)
      * ========================================================= */
-    public function importConfirm(Request $request)
+    public function importConfirm(Request $request) 
     {
         $data = $request->input('data', []);
 
@@ -238,4 +240,42 @@ class PencairanDanaController extends Controller
 
         return [$header, $rows];
     }
+
+    /* =========================================================
+    * KIRIM NOTIFIKASI WHATSAPP (SPRINT 3B)
+    * ========================================================= */
+    public function kirimWA($id)
+    {
+    $pencairan = PencairanDana::with('pegawai')->findOrFail($id);
+
+        // Ambil nomor WhatsApp pegawai
+        $nomor = $pencairan->pegawai->no_whatsapp ?? null;
+
+        if (!$nomor) {
+            return back()->with('error', 'Nomor WhatsApp pegawai tidak tersedia.');
+        }
+
+        // Generate pesan dari template
+        $pesan = WhatsAppTemplate::pencairanDana($pencairan);
+
+        // Kirim via Fonnte
+        $kirim = WhatsAppService::send($nomor, $pesan);
+
+        if ($kirim['status']) {
+
+            $pencairan->update([
+                'status_notifikasi' => 'terkirim',
+            ]);
+
+            return back()->with('success', 'Pesan WhatsApp berhasil dikirim.');
+        }
+
+        // Jika gagal
+        $pencairan->update([
+            'status_notifikasi' => 'gagal',
+        ]);
+
+        return back()->with('error', 'Gagal mengirim WhatsApp.');
+    }
+
 }

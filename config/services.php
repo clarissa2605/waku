@@ -34,5 +34,11 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    
+    'fonnte' => [
+        'api_key'  => env('FONNTE_API_KEY'),
+        'base_url' => env('FONNTE_BASE_URL'),
+],
+
 
 ];

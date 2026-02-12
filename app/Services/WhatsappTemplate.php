@@ -6,25 +6,32 @@ use App\Models\PencairanDana;
 
 class WhatsAppTemplate
 {
-    public static function pencairanDana(PencairanDana $p)
+    public static function pencairanDana(PencairanDana $pencairan): string
     {
+        $pegawai = $pencairan->pegawai;
+
+        $nominalKotor  = (int) $pencairan->nominal;
+        $potongan      = (int) ($pencairan->potongan ?? 0);
+        $nominalBersih = (int) ($pencairan->nominal_bersih ?? ($nominalKotor - $potongan));
+
         return
-"📢 Informasi Pencairan Dana
+"📢 *Informasi Pencairan Dana*
 BPS Provinsi Sulawesi Utara
 
-Yth. Bapak/Ibu {$p->pegawai->nama}
+Yth. Bapak/Ibu *{$pegawai->nama}*
 
-Kami informasikan bahwa pencairan dana
-{$p->jenis_dana} telah dilakukan dengan rincian:
+Kami informasikan bahwa pencairan dana *{$pencairan->jenis_dana}* telah ditransfer dengan rincian:
 
-💰 Nominal Total : Rp " . number_format($p->nominal, 0, ',', '.') . "
-➖ Potongan      : Rp " . number_format($p->potongan, 0, ',', '.') . "
-✅ Diterima      : Rp " . number_format($p->nominal_bersih, 0, ',', '.') . "
+💰 *Total*      : Rp " . number_format($nominalKotor, 0, ',', '.') . "
+✂️ *Potongan*   : Rp " . number_format($potongan, 0, ',', '.') . "
+✅ *Diterima*   : Rp " . number_format($nominalBersih, 0, ',', '.') . "
 
-🗓 Tanggal : {$p->tanggal}
-📝 Keterangan : {$p->keterangan}
+🗓 *Tanggal*    :  {$pencairan->tanggal}
+📝 *Keterangan* : {$pencairan->keterangan}
+
+Apabila terdapat pertanyaan, silakan menghubungi Bagian Keuangan.
 
 Terima kasih.
-Bagian Keuangan";
+*Bagian Keuangan*";
     }
 }
