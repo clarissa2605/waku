@@ -15,23 +15,51 @@ class WhatsAppTemplate
         $nominalBersih = (int) ($pencairan->nominal_bersih ?? ($nominalKotor - $potongan));
 
         return
-"📢 *Informasi Pencairan Dana*
+"📢*INFORMASI PENCAIRAN DANA*
 BPS Provinsi Sulawesi Utara
 
-Yth. Bapak/Ibu *{$pegawai->nama}*
+Yth. Bapak/Ibu *{$pegawai->nama}*,
 
-Kami informasikan bahwa pencairan dana *{$pencairan->jenis_dana}* telah ditransfer dengan rincian:
+Dengan ini kami informasikan bahwa pencairan dana telah dilakukan dengan rincian sebagai berikut:
 
-💰 *Total*      : Rp " . number_format($nominalKotor, 0, ',', '.') . "
-✂️ *Potongan*   : Rp " . number_format($potongan, 0, ',', '.') . "
-✅ *Diterima*   : Rp " . number_format($nominalBersih, 0, ',', '.') . "
+───────────────
 
-🗓 *Tanggal*    :  {$pencairan->tanggal}
-📝 *Keterangan* : {$pencairan->keterangan}
+*Jenis Dana*
+{$pencairan->jenis_dana}
 
-Apabila terdapat pertanyaan, silakan menghubungi Bagian Keuangan.
+*Bank*
+{$pencairan->nama_bank}
+
+*Nama Rekening*
+{$pencairan->nama_rekening}
+
+*Nomor Rekening*
+{$pencairan->no_rekening}
+
+───────────────
+
+*Total*
+Rp " . number_format($nominalKotor, 0, ',', '.') . "
+
+*Potongan*
+Rp " . number_format($potongan, 0, ',', '.') . "
+
+*Diterima*
+Rp " . number_format($nominalBersih, 0, ',', '.') . "
+
+───────────────
+
+*Tanggal*
+{$pencairan->tanggal}
+
+*Keterangan*
+{$pencairan->keterangan}
+
+Apabila terdapat pertanyaan, silakan menghubungi Tim Keuangan.
 
 Terima kasih.
-*Bagian Keuangan*";
+
+*Tim Keuangan*
+BPS Provinsi Sulawesi Utara";
     }
 }

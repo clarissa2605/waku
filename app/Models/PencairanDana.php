@@ -9,8 +9,11 @@ class PencairanDana extends Model
     protected $table = 'pencairan_dana';
     protected $primaryKey = 'id_pencairan';
 
-    protected $fillable = [
+protected $fillable = [
     'pegawai_id',
+    'nama_bank',
+    'nama_rekening',
+    'no_rekening',
     'jenis_dana',
     'nominal',
     'potongan',
@@ -18,7 +21,7 @@ class PencairanDana extends Model
     'tanggal',
     'keterangan',
     'status_notifikasi',
-    ];
+];
 
 
     public function pegawai()

@@ -7,8 +7,9 @@ use App\Models\PencairanDana;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Services\WhatsAppTemplate;
-use App\Services\WhatsAppService; 
 use App\Http\Controllers\Controller;
+use App\Jobs\KirimWhatsAppJob;
+
 class PencairanDanaController extends Controller
 {
     /* =========================================================
@@ -36,19 +37,28 @@ class PencairanDanaController extends Controller
     }
 
     /* =========================================================
-     * SIMPAN PENCAIRAN INDIVIDU (TAMBAH POTONGAN & BERSIH)
+     * SIMPAN PENCAIRAN INDIVIDU
      * ========================================================= */
     public function store(Request $request)
     {
-    $validated = $request->validate([
-    'pegawai_id' => 'required|exists:pegawai,id_pegawai',
-    'jenis_dana' => 'required|string|max:100',
-    'nominal'    => 'required|numeric|min:1',
-    'potongan'   => 'nullable|numeric|min:0',
-    'tanggal'    => 'required|date',
-    'keterangan' => 'nullable|string|max:255',
-    ]);
+        $validated = $request->validate([
+            'pegawai_id'     => 'required|exists:pegawai,id_pegawai',
 
+            // ✅ TAMBAHAN BANK
+            'nama_bank'      => 'required|string|max:100',
+
+            // ✅ TAMBAHAN REKENING
+            'nama_rekening'  => 'required|string|max:100',
+            'no_rekening'    => 'required|digits_between:8,20',
+
+            'jenis_dana'     => 'required|string|max:100',
+            'nominal'        => 'required|numeric|min:1',
+            'potongan'       => 'nullable|numeric|min:0',
+            'tanggal'        => 'required|date',
+            'keterangan'     => 'nullable|string|max:255',
+        ], [
+            'no_rekening.digits_between' => 'Nomor rekening hanya boleh angka dan minimal 8 digit.',
+        ]);
 
         $pegawai = Pegawai::where('id_pegawai', $validated['pegawai_id'])
             ->where('status', 'aktif')
@@ -60,6 +70,14 @@ class PencairanDanaController extends Controller
 
         $pencairan = PencairanDana::create([
             'pegawai_id'     => $pegawai->id_pegawai,
+
+            // ✅ TAMBAHAN BANK
+            'nama_bank'      => $validated['nama_bank'],
+
+            // ✅ TAMBAHAN REKENING
+            'nama_rekening'  => $validated['nama_rekening'],
+            'no_rekening'    => $validated['no_rekening'],
+
             'jenis_dana'     => $validated['jenis_dana'],
             'nominal'        => $nominal,
             'potongan'       => $potongan,
@@ -69,7 +87,7 @@ class PencairanDanaController extends Controller
             'status_notifikasi' => 'belum',
         ]);
 
-        // Generate pesan WA (Sprint 3A)
+        // Generate pesan WA
         $pesanWa = WhatsAppTemplate::pencairanDana($pencairan);
         // logger($pesanWa);
 
@@ -87,7 +105,7 @@ class PencairanDanaController extends Controller
     }
 
     /* =========================================================
-     * PREVIEW IMPORT CSV (TAMBAH POTONGAN & BERSIH)
+     * PREVIEW IMPORT CSV
      * ========================================================= */
     public function importPreview(Request $request)
     {
@@ -120,80 +138,90 @@ class PencairanDanaController extends Controller
             $nominal  = (int) preg_replace('/[^0-9]/', '', $data['nominal'] ?? 0);
             $potongan = (int) preg_replace('/[^0-9]/', '', $data['potongan'] ?? 0);
 
-            $rows[] = [
-                'nip'        => $nip,
-                'nama'       => $pegawai->nama ?? '❌ TIDAK DITEMUKAN',
-                'tanggal'    => $data['tanggal'] ?? '',
-                'jenis_dana' => $data['jenis_dana'] ?? '',
-                'nominal'    => $nominal,
-                'potongan'   => $potongan,
-                'bersih'     => $nominal - $potongan,
-                'keterangan' => $data['keterangan'] ?? '-',
-                'valid'      => $pegawai ? 1 : 0,
-            ];
+$rows[] = [
+    'nip'           => $nip,
+    'nama'          => $pegawai->nama ?? '❌ TIDAK DITEMUKAN',
+    'tanggal'       => $data['tanggal'] ?? '',
+    'jenis_dana'    => $data['jenis_dana'] ?? '',
+    'nominal'       => $nominal,
+    'potongan'      => $potongan,
+    'bersih'        => $nominal - $potongan,
+
+    // ✅ TAMBAHAN BANK & REKENING
+    'nama_bank'     => $data['nama_bank'] ?? '',
+    'nama_rekening' => $data['nama_rekening'] ?? '',
+    'no_rekening'   => preg_replace('/[^0-9]/', '', $data['no_rekening'] ?? ''),
+
+    'keterangan'    => $data['keterangan'] ?? '-',
+    'valid'         => $pegawai ? 1 : 0,
+];
+
         }
 
         return view('admin_pencairan.import_preview', compact('rows'));
     }
 
-    /* =========================================================
-     * KONFIRMASI & SIMPAN HASIL IMPORT (TAMBAH POTONGAN & BERSIH)
-     * ========================================================= */
-    public function importConfirm(Request $request) 
-    {
-        $data = $request->input('data', []);
+/* =========================================================
+ * KONFIRMASI & SIMPAN IMPORT
+ * ========================================================= */
+public function importConfirm(Request $request)
+{
+    $data = $request->input('data', []);
 
-        DB::beginTransaction();
+    DB::beginTransaction();
 
-        try {
-            foreach ($data as $item) {
+    try {
+        foreach ($data as $item) {
 
-                if (empty($item['valid'])) {
-                    continue;
-                }
-
-                $pegawai = Pegawai::where('nip', trim($item['nip']))
-                    ->where('status', 'aktif')
-                    ->first();
-
-                if (!$pegawai) {
-                    continue;
-                }
-
-                $nominal  = (int) $item['nominal'];
-                $potongan = (int) ($item['potongan'] ?? 0);
-
-                $pencairan = PencairanDana::create([
-                    'pegawai_id'     => $pegawai->id_pegawai,
-                    'tanggal'        => $item['tanggal'],
-                    'jenis_dana'     => trim($item['jenis_dana']),
-                    'nominal'        => $nominal,
-                    'potongan'       => $potongan,
-                    'nominal_bersih' => $nominal - $potongan,
-                    'keterangan'     => $item['keterangan'] ?? null,
-                    'status_notifikasi' => 'belum',
-                ]);
-
-                // Generate pesan WA (Sprint 3A)
-                $pesanWa = WhatsAppTemplate::pencairanDana($pencairan);
-                // logger($pesanWa);
+            if (empty($item['valid'])) {
+                continue;
             }
 
-            DB::commit();
+            $pegawai = Pegawai::where('nip', trim($item['nip']))
+                ->where('status', 'aktif')
+                ->first();
 
-            return redirect()
-                ->route('pencairan.index')
-                ->with('success', 'Import pencairan dana berhasil');
+            if (!$pegawai) {
+                continue;
+            }
 
-        } catch (\Exception $e) {
+            $nominal  = (int) $item['nominal'];
+            $potongan = (int) ($item['potongan'] ?? 0);
 
-            DB::rollBack();
+            PencairanDana::create([
+                'pegawai_id'     => $pegawai->id_pegawai,
 
-            return back()->withErrors([
-                'file' => 'Gagal menyimpan data: ' . $e->getMessage(),
+                // ✅ SIMPAN DATA ASLI DARI CSV
+                'nama_bank'      => $item['nama_bank'] ?? null,
+                'nama_rekening'  => $item['nama_rekening'] ?? null,
+                'no_rekening'    => $item['no_rekening'] ?? null,
+
+                'tanggal'        => $item['tanggal'],
+                'jenis_dana'     => trim($item['jenis_dana']),
+                'nominal'        => $nominal,
+                'potongan'       => $potongan,
+                'nominal_bersih' => $nominal - $potongan,
+                'keterangan'     => $item['keterangan'] ?? null,
+                'status_notifikasi' => 'belum',
             ]);
         }
+
+        DB::commit();
+
+        return redirect()
+            ->route('pencairan.index')
+            ->with('success', 'Import pencairan dana berhasil');
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()->withErrors([
+            'file' => 'Gagal menyimpan data: ' . $e->getMessage(),
+        ]);
     }
+}
+
 
     /* =========================================================
      * PREVIEW PESAN WHATSAPP
@@ -204,15 +232,22 @@ class PencairanDanaController extends Controller
 
         $pesan = WhatsAppTemplate::pencairanDana($pencairan);
 
-        return view('admin_pencairan.preview_wa', [
-            'pencairan' => $pencairan,
-            'pesan'     => $pesan,
-        ]);
+        return view('admin_pencairan.preview_wa', compact('pencairan', 'pesan'));
     }
 
     /* =========================================================
-     * HELPER: BACA CSV (AUTO-DETECT , ATAU ;)
+     * KIRIM NOTIFIKASI WHATSAPP
      * ========================================================= */
+    public function kirimWA($id)
+{
+    $pencairan = PencairanDana::findOrFail($id);
+
+    // Kirim ke queue (background)
+    KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
+
+    return back()->with('success', 'Pesan sedang diproses di background.');
+}
+
     private function readCsv(Request $request): array
     {
         $file = fopen($request->file->getRealPath(), 'r');
@@ -223,11 +258,7 @@ class PencairanDanaController extends Controller
         $delimiter = str_contains($firstLine, ';') ? ';' : ',';
 
         $header = fgetcsv($file, 0, $delimiter);
-        $header = array_map(function ($h) {
-            return strtolower(
-                trim(preg_replace('/[\x{FEFF}\x{200B}\s]+/u', '', $h))
-            );
-        }, $header);
+        $header = array_map(fn($h) => strtolower(trim($h)), $header);
 
         $rows = [];
         while (($row = fgetcsv($file, 0, $delimiter)) !== false) {
@@ -240,42 +271,53 @@ class PencairanDanaController extends Controller
 
         return [$header, $rows];
     }
-
     /* =========================================================
-    * KIRIM NOTIFIKASI WHATSAPP (SPRINT 3B)
-    * ========================================================= */
-    public function kirimWA($id)
-    {
-    $pencairan = PencairanDana::with('pegawai')->findOrFail($id);
+ * DOWNLOAD TEMPLATE CSV
+ * ========================================================= */
+public function downloadTemplate()
+{
+    $filename = "template_import_pencairan_dana.csv";
 
-        // Ambil nomor WhatsApp pegawai
-        $nomor = $pencairan->pegawai->no_whatsapp ?? null;
+    $headers = [
+        "Content-Type" => "text/csv",
+        "Content-Disposition" => "attachment; filename=\"$filename\"",
+    ];
 
-        if (!$nomor) {
-            return back()->with('error', 'Nomor WhatsApp pegawai tidak tersedia.');
-        }
+    $columns = [
+        'nip',
+        'tanggal',
+        'jenis_dana',
+        'nominal',
+        'potongan',
+        'nama_bank',
+        'nama_rekening',
+        'no_rekening',
+        'keterangan'
+    ];
 
-        // Generate pesan dari template
-        $pesan = WhatsAppTemplate::pencairanDana($pencairan);
+    $callback = function () use ($columns) {
+        $file = fopen('php://output', 'w');
 
-        // Kirim via Fonnte
-        $kirim = WhatsAppService::send($nomor, $pesan);
+        // Header CSV
+        fputcsv($file, $columns, ';');
 
-        if ($kirim['status']) {
+        // Contoh 1 baris dummy
+        fputcsv($file, [
+            '123456789012345678',
+            '2024-07-01',
+            'Tunjangan Kinerja',
+            '5000000',
+            '0',
+            'BRI',
+            'JOHN DOE',
+            '1234567890',
+            'Tunjangan bulan Juli'
+        ], ';');
 
-            $pencairan->update([
-                'status_notifikasi' => 'terkirim',
-            ]);
+        fclose($file);
+    };
 
-            return back()->with('success', 'Pesan WhatsApp berhasil dikirim.');
-        }
-
-        // Jika gagal
-        $pencairan->update([
-            'status_notifikasi' => 'gagal',
-        ]);
-
-        return back()->with('error', 'Gagal mengirim WhatsApp.');
-    }
+    return response()->stream($callback, 200, $headers);
+}
 
 }

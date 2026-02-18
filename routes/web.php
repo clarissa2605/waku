@@ -103,6 +103,7 @@ Route::prefix('admin')
 
         Route::get('admin/pencairan/{id}/preview-wa',[PencairanDanaController::class, 'previewPesanWA'])->name('pencairan.preview_wa');
 
+        Route::get('/admin/pencairan/template', [\App\Http\Controllers\PencairanDanaController::class, 'downloadTemplate'])->name('pencairan.template');
 
     });
 
