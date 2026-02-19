@@ -11,6 +11,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use App\Models\LogPencairan;
+
 
 class KirimWhatsAppJob implements ShouldQueue
 {
@@ -78,14 +80,32 @@ class KirimWhatsAppJob implements ShouldQueue
 
         $kirim = WhatsAppService::send($nomor, $pesan);
 
-        if ($kirim['status']) {
-            $pencairan->update([
-                'status_notifikasi' => 'terkirim'
-            ]);
-        } else {
-            $pencairan->update([
-                'status_notifikasi' => 'gagal'
-            ]);
-        }
+if ($kirim['status']) {
+
+    $pencairan->update([
+        'status_notifikasi' => 'terkirim'
+    ]);
+
+    LogPencairan::create([
+        'id_pencairan' => $pencairan->id_pencairan,
+        'pegawai_id'   => $pencairan->pegawai_id,
+        'aksi'         => 'terkirim',
+        'deskripsi'    => 'Notifikasi WhatsApp berhasil dikirim',
+    ]);
+
+} else {
+
+    $pencairan->update([
+        'status_notifikasi' => 'gagal'
+    ]);
+
+    LogPencairan::create([
+        'id_pencairan' => $pencairan->id_pencairan,
+        'pegawai_id'   => $pencairan->pegawai_id,
+        'aksi'         => 'gagal',
+        'deskripsi'    => 'Notifikasi WhatsApp gagal dikirim',
+    ]);
+}
+
     }
 }

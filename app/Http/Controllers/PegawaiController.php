@@ -119,6 +119,7 @@ class PegawaiController extends Controller
             'email'      => $request->email,
             'password'   => Hash::make($request->password),
             'pegawai_id' => $pegawai->id_pegawai,
+            'role'       => 'pegawai',
         ]);
 
         return redirect()

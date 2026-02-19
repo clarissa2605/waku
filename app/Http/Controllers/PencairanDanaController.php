@@ -6,9 +6,12 @@ use App\Models\Pegawai;
 use App\Models\PencairanDana;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Services\WhatsAppTemplate;
 use App\Http\Controllers\Controller;
 use App\Jobs\KirimWhatsAppJob;
+use App\Models\LogPencairan;
+
 
 class PencairanDanaController extends Controller
 {
@@ -86,6 +89,15 @@ class PencairanDanaController extends Controller
             'keterangan'     => $validated['keterangan'] ?? null,
             'status_notifikasi' => 'belum',
         ]);
+
+        // ✅ SIMPAN LOG
+        LogPencairan::create([
+        'id_pencairan' => $pencairan->id_pencairan,
+        'pegawai_id'   => $pencairan->pegawai_id,
+        'aksi'         => 'dibuat',
+        'deskripsi'    => 'Pencairan dana dibuat oleh admin',
+        ]);
+
 
         // Generate pesan WA
         $pesanWa = WhatsAppTemplate::pencairanDana($pencairan);
@@ -271,7 +283,34 @@ public function importConfirm(Request $request)
 
         return [$header, $rows];
     }
-    /* =========================================================
+
+/* =========================================================
+ * RIWAYAT PENCAIRAN UNTUK PEGAWAI
+ * ========================================================= */
+public function dashboardPegawai()
+{
+    $user = Auth::user();
+    if (!$user->pegawai_id) {
+        abort(403, 'Akun tidak terhubung ke data pegawai.');
+    }
+
+    $riwayat = PencairanDana::where('pegawai_id', $user->pegawai_id)
+        ->orderBy('tanggal', 'desc')
+        ->get();
+
+    $totalNominal  = $riwayat->sum('nominal');
+    $totalPotongan = $riwayat->sum('potongan');
+    $totalBersih   = $riwayat->sum('nominal_bersih');
+
+    return view('pegawai.dashboard', compact(
+        'riwayat',
+        'totalNominal',
+        'totalPotongan',
+        'totalBersih'
+    ));
+}
+
+/* =========================================================
  * DOWNLOAD TEMPLATE CSV
  * ========================================================= */
 public function downloadTemplate()

@@ -114,11 +114,9 @@ Route::prefix('admin')
 | PEGAWAI
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:pegawai'])->group(function () {
-    Route::get('/pegawai/dashboard', function () {
-        return 'Dashboard Pegawai';
-    });
-});
+Route::get('/pegawai/dashboard', [PencairanDanaController::class, 'dashboardPegawai'])
+    ->name('pegawai.dashboard');
+
 
 /*
 |--------------------------------------------------------------------------
