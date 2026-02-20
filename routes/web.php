@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PencairanDanaController;
@@ -31,9 +30,9 @@ Route::prefix('admin')
         | DASHBOARD
         |--------------------------------------------------------------------------
         */
-        Route::get('/dashboard', function () {
-            return 'Dashboard Admin';
-        });
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('admin.dashboard');
 
         /*
         |--------------------------------------------------------------------------
@@ -122,6 +121,7 @@ Route::post('kelompok/{id}/add-mitra', [KelompokMitraController::class, 'addMitr
 Route::delete('kelompok/{kelompokId}/remove/{mitraId}', [KelompokMitraController::class, 'removeMitra'])
     ->name('kelompok.removeMitra');
 
+Route::resource('mitra', \App\Http\Controllers\MitraController::class);
     });
 
 
@@ -148,6 +148,8 @@ Route::prefix('viewer')
             [PencairanDanaController::class, 'dashboardViewer']
         )->name('viewer.dashboard');
 
+        
+
 });
 
 /*
@@ -162,14 +164,20 @@ require __DIR__ . '/auth.php';
 | DEV UTILITIES
 |--------------------------------------------------------------------------
 */
-Route::get('/force-logout', function (Request $request) {
-    Auth::logout();
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', function () {
+        return view('profile.edit');
+    })->name('profile.edit');
+});
+Route::get('/whoami', function () {
+    return Auth::check() ? Auth::user() : 'NOT LOGGED IN';
+});
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::logout();
+
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
     return redirect('/login');
-});
-
-Route::get('/whoami', function () {
-    return Auth::check() ? Auth::user() : 'NOT LOGGED IN';
-});
+})->name('logout');

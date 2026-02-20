@@ -13,30 +13,21 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use App\Models\LogPencairan;
 
-
 class KirimWhatsAppJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $pencairanId;
 
-    public $tries = 3; // retry maksimal 3x
+    public $tries = 3;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct($pencairanId)
     {
         $this->pencairanId = $pencairanId;
-
-        // ⏳ Delay random 30–60 detik sebelum diproses
         $this->delay(now()->addSeconds(rand(30, 60)));
     }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
+    public function handle(WhatsAppService $waService): void
     {
         // ==============================
         // 🔒 LIMIT 20 PESAN PER JAM
@@ -47,14 +38,12 @@ class KirimWhatsAppJob implements ShouldQueue
         $count = Cache::get($limitKey, 0);
 
         if ($count >= $maxPerHour) {
-            // Kalau sudah penuh, tunda 10 menit
             $this->release(600);
             return;
         }
 
         Cache::put($limitKey, $count + 1, now()->addHour());
 
-        // Delay natural seperti manusia
         sleep(rand(3, 8));
 
         // ==============================
@@ -67,9 +56,9 @@ class KirimWhatsAppJob implements ShouldQueue
             return;
         }
 
-        $nomor = $pencairan->pegawai->no_whatsapp ?? null;
+        $pegawai = $pencairan->pegawai;
 
-        if (!$nomor) {
+        if (!$pegawai->no_whatsapp) {
             $pencairan->update([
                 'status_notifikasi' => 'gagal'
             ]);
@@ -78,34 +67,34 @@ class KirimWhatsAppJob implements ShouldQueue
 
         $pesan = WhatsAppTemplate::pencairanDana($pencairan);
 
-        $kirim = WhatsAppService::send($nomor, $pesan);
+        // 🔥 PANGGIL SERVICE BARU
+        $kirim = $waService->send($pegawai, $pesan);
 
-if ($kirim['status']) {
+        if ($kirim['status'] === 'success') {
 
-    $pencairan->update([
-        'status_notifikasi' => 'terkirim'
-    ]);
+            $pencairan->update([
+                'status_notifikasi' => 'terkirim'
+            ]);
 
-    LogPencairan::create([
-        'id_pencairan' => $pencairan->id_pencairan,
-        'pegawai_id'   => $pencairan->pegawai_id,
-        'aksi'         => 'terkirim',
-        'deskripsi'    => 'Notifikasi WhatsApp berhasil dikirim',
-    ]);
+            LogPencairan::create([
+                'id_pencairan' => $pencairan->id_pencairan,
+                'pegawai_id'   => $pencairan->pegawai_id,
+                'aksi'         => 'terkirim',
+                'deskripsi'    => 'Notifikasi WhatsApp berhasil dikirim',
+            ]);
 
-} else {
+        } else {
 
-    $pencairan->update([
-        'status_notifikasi' => 'gagal'
-    ]);
+            $pencairan->update([
+                'status_notifikasi' => 'gagal'
+            ]);
 
-    LogPencairan::create([
-        'id_pencairan' => $pencairan->id_pencairan,
-        'pegawai_id'   => $pencairan->pegawai_id,
-        'aksi'         => 'gagal',
-        'deskripsi'    => 'Notifikasi WhatsApp gagal dikirim',
-    ]);
-}
-
+            LogPencairan::create([
+                'id_pencairan' => $pencairan->id_pencairan,
+                'pegawai_id'   => $pencairan->pegawai_id,
+                'aksi'         => 'gagal',
+                'deskripsi'    => 'Notifikasi WhatsApp gagal dikirim',
+            ]);
+        }
     }
 }
