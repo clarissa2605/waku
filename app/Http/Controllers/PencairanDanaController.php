@@ -359,4 +359,55 @@ public function downloadTemplate()
     return response()->stream($callback, 200, $headers);
 }
 
+public function dashboardViewer()
+{
+    // ===============================
+    // RINGKASAN TOTAL
+    // ===============================
+    $totalDana      = PencairanDana::sum('nominal');
+    $totalPotongan  = PencairanDana::sum('potongan');
+    $totalDiterima  = PencairanDana::sum('nominal_bersih');
+    $totalTransaksi = PencairanDana::count();
+
+    // ===============================
+    // GRAFIK PER BULAN (LINE)
+    // ===============================
+    $perBulan = PencairanDana::selectRaw("
+        DATE_FORMAT(tanggal, '%Y-%m') as bulan,
+        SUM(nominal_bersih) as total
+    ")
+    ->groupBy('bulan')
+    ->orderBy('bulan')
+    ->get();
+
+    // ===============================
+    // GRAFIK JENIS DANA (PIE)
+    // ===============================
+    $perJenis = PencairanDana::selectRaw("
+        jenis_dana,
+        SUM(nominal_bersih) as total
+    ")
+    ->groupBy('jenis_dana')
+    ->get();
+
+    // ===============================
+    // STATUS NOTIFIKASI (DONUT)
+    // ===============================
+    $statusNotif = PencairanDana::selectRaw("
+        status_notifikasi,
+        COUNT(*) as total
+    ")
+    ->groupBy('status_notifikasi')
+    ->get();
+
+    return view('viewer.dashboard', compact(
+        'totalDana',
+        'totalPotongan',
+        'totalDiterima',
+        'totalTransaksi',
+        'perBulan',
+        'perJenis',
+        'statusNotif'
+    ));
+}
 }

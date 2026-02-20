@@ -123,10 +123,14 @@ Route::get('/pegawai/dashboard', [PencairanDanaController::class, 'dashboardPega
 | VIEWER / MITRA
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:viewer'])->group(function () {
-    Route::get('/viewer/dashboard', function () {
-        return 'Dashboard Viewer';
-    });
+Route::prefix('viewer')
+    ->middleware(['auth', 'role:viewer'])
+    ->group(function () {
+
+        Route::get('/dashboard',
+            [PencairanDanaController::class, 'dashboardViewer']
+        )->name('viewer.dashboard');
+
 });
 
 /*
