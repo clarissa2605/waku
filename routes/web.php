@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PencairanDanaController;
+use App\Http\Controllers\KelompokMitraController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,6 +105,22 @@ Route::prefix('admin')
         Route::get('admin/pencairan/{id}/preview-wa',[PencairanDanaController::class, 'previewPesanWA'])->name('pencairan.preview_wa');
 
         Route::get('/admin/pencairan/template', [\App\Http\Controllers\PencairanDanaController::class, 'downloadTemplate'])->name('pencairan.template');
+
+        /*
+|--------------------------------------------------------------------------
+| KELOMPOK MITRA
+|--------------------------------------------------------------------------
+*/
+
+
+Route::get('kelompok/{id}', [KelompokMitraController::class, 'show'])
+    ->name('kelompok.show');
+
+Route::post('kelompok/{id}/add-mitra', [KelompokMitraController::class, 'addMitra'])
+    ->name('kelompok.addMitra');
+
+Route::delete('kelompok/{kelompokId}/remove/{mitraId}', [KelompokMitraController::class, 'removeMitra'])
+    ->name('kelompok.removeMitra');
 
     });
 
