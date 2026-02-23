@@ -11,6 +11,7 @@ use App\Services\WhatsAppTemplate;
 use App\Http\Controllers\Controller;
 use App\Jobs\KirimWhatsAppJob;
 use App\Models\LogPencairan;
+use App\Models\PencairanDanaMitra;
 
 
 class PencairanDanaController extends Controller
@@ -119,59 +120,86 @@ class PencairanDanaController extends Controller
     /* =========================================================
      * PREVIEW IMPORT CSV
      * ========================================================= */
-    public function importPreview(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|file|mimes:csv,txt|max:2048',
-        ]);
+public function importPreview(Request $request)
+{
+    $request->validate([
+        'mode' => 'required|in:pegawai,mitra',
+        'file' => 'required|file|mimes:csv,txt|max:2048',
+    ]);
 
-        [$header, $rowsCsv] = $this->readCsv($request);
+    $mode = $request->mode;
 
-        $rows = [];
+    [$header, $rowsCsv] = $this->readCsv($request);
 
-        foreach ($rowsCsv as $row) {
+    $rows = [];
 
-            if (count($header) !== count($row)) {
-                continue;
-            }
+    foreach ($rowsCsv as $row) {
 
-            $data = array_combine($header, $row);
+        if (count($header) !== count($row)) {
+            continue;
+        }
 
-            if (!isset($data['nip']) || trim($data['nip']) === '') {
-                continue;
-            }
+        $data = array_combine($header, $row);
 
-            $nip = trim((string) $data['nip']);
+        $identifier = trim((string) ($data['nip'] ?? $data['nik'] ?? ''));
 
-            $pegawai = Pegawai::where('nip', $nip)
+        if ($identifier === '') {
+            continue;
+        }
+
+        $nominal  = (int) preg_replace('/[^0-9]/', '', $data['nominal'] ?? 0);
+        $potongan = (int) preg_replace('/[^0-9]/', '', $data['potongan'] ?? 0);
+
+        $valid = false;
+        $nama  = '';
+
+        if ($mode === 'pegawai') {
+
+            $pegawai = Pegawai::where('nip', $identifier)
                 ->where('status', 'aktif')
                 ->first();
 
-            $nominal  = (int) preg_replace('/[^0-9]/', '', $data['nominal'] ?? 0);
-            $potongan = (int) preg_replace('/[^0-9]/', '', $data['potongan'] ?? 0);
+            $valid = $pegawai ? true : false;
+            $nama  = $pegawai->nama ?? '❌ TIDAK DITEMUKAN';
 
-$rows[] = [
-    'nip'           => $nip,
-    'nama'          => $pegawai->nama ?? '❌ TIDAK DITEMUKAN',
-    'tanggal'       => $data['tanggal'] ?? '',
-    'jenis_dana'    => $data['jenis_dana'] ?? '',
-    'nominal'       => $nominal,
-    'potongan'      => $potongan,
-    'bersih'        => $nominal - $potongan,
+        } else {
 
-    // ✅ TAMBAHAN BANK & REKENING
-    'nama_bank'     => $data['nama_bank'] ?? '',
-    'nama_rekening' => $data['nama_rekening'] ?? '',
-    'no_rekening'   => preg_replace('/[^0-9]/', '', $data['no_rekening'] ?? ''),
+            $kelompok_id = $data['kelompok_id'] ?? null;
 
-    'keterangan'    => $data['keterangan'] ?? '-',
-    'valid'         => $pegawai ? 1 : 0,
-];
+            $mitra = \App\Models\Mitra::where('nik', $identifier)
+                ->where('status', 'aktif')
+                ->first();
 
+            if ($mitra && $kelompok_id) {
+                $validKelompok = $mitra->kelompok()
+                    ->where('id_kelompok', $kelompok_id)
+                    ->exists();
+
+                $valid = $validKelompok;
+                $nama  = $mitra->nama_mitra;
+            } else {
+                $nama = '❌ MITRA / KELOMPOK TIDAK VALID';
+            }
         }
 
-        return view('admin_pencairan.import_preview', compact('rows'));
+        $rows[] = [
+            'identifier'    => $identifier,
+            'nama'          => $nama,
+            'tanggal'       => $data['tanggal'] ?? '',
+            'jenis_dana'    => $data['jenis_dana'] ?? '',
+            'nominal'       => $nominal,
+            'potongan'      => $potongan,
+            'bersih'        => $nominal - $potongan,
+            'nama_bank'     => $data['nama_bank'] ?? '',
+            'nama_rekening' => $data['nama_rekening'] ?? '',
+            'no_rekening'   => preg_replace('/[^0-9]/', '', $data['no_rekening'] ?? ''),
+            'keterangan'    => $data['keterangan'] ?? '-',
+            'valid'         => $valid ? 1 : 0,
+        ];
     }
+
+    return view('admin_pencairan.import_preview', compact('rows', 'mode'));
+}
 
 /* =========================================================
  * KONFIRMASI & SIMPAN IMPORT
@@ -179,50 +207,78 @@ $rows[] = [
 public function importConfirm(Request $request)
 {
     $data = $request->input('data', []);
+    $mode = $request->input('mode');
 
     DB::beginTransaction();
 
     try {
+
         foreach ($data as $item) {
 
             if (empty($item['valid'])) {
                 continue;
             }
 
-            $pegawai = Pegawai::where('nip', trim($item['nip']))
-                ->where('status', 'aktif')
-                ->first();
-
-            if (!$pegawai) {
-                continue;
-            }
-
             $nominal  = (int) $item['nominal'];
             $potongan = (int) ($item['potongan'] ?? 0);
+            $bersih   = $nominal - $potongan;
 
-            PencairanDana::create([
-                'pegawai_id'     => $pegawai->id_pegawai,
+            if ($mode === 'pegawai') {
 
-                // ✅ SIMPAN DATA ASLI DARI CSV
-                'nama_bank'      => $item['nama_bank'] ?? null,
-                'nama_rekening'  => $item['nama_rekening'] ?? null,
-                'no_rekening'    => $item['no_rekening'] ?? null,
+                $pegawai = Pegawai::where('nip', trim($item['identifier']))
+                    ->where('status', 'aktif')
+                    ->first();
 
-                'tanggal'        => $item['tanggal'],
-                'jenis_dana'     => trim($item['jenis_dana']),
-                'nominal'        => $nominal,
-                'potongan'       => $potongan,
-                'nominal_bersih' => $nominal - $potongan,
-                'keterangan'     => $item['keterangan'] ?? null,
-                'status_notifikasi' => 'belum',
-            ]);
+                if (!$pegawai) {
+                    continue;
+                }
+
+                PencairanDana::create([
+                    'pegawai_id'     => $pegawai->id_pegawai,
+                    'nama_bank'      => $item['nama_bank'] ?? null,
+                    'nama_rekening'  => $item['nama_rekening'] ?? null,
+                    'no_rekening'    => $item['no_rekening'] ?? null,
+                    'tanggal'        => $item['tanggal'],
+                    'jenis_dana'     => trim($item['jenis_dana']),
+                    'nominal'        => $nominal,
+                    'potongan'       => $potongan,
+                    'nominal_bersih' => $bersih,
+                    'keterangan'     => $item['keterangan'] ?? null,
+                    'status_notifikasi' => 'belum',
+                ]);
+
+            } else {
+
+                $mitra = \App\Models\Mitra::where('nik', trim($item['identifier']))
+                    ->where('status', 'aktif')
+                    ->first();
+
+                if (!$mitra) {
+                    continue;
+                }
+
+                PencairanDanaMitra::create([
+                    'mitra_id'       => $mitra->id_mitra,
+                    'kelompok_id'    => $item['kelompok_id'] ?? null,
+                    'nama_bank'      => $item['nama_bank'] ?? null,
+                    'nama_rekening'  => $item['nama_rekening'] ?? null,
+                    'no_rekening'    => $item['no_rekening'] ?? null,
+                    'tanggal'        => $item['tanggal'],
+                    'jenis_dana'     => trim($item['jenis_dana']),
+                    'nominal'        => $nominal,
+                    'potongan'       => $potongan,
+                    'nominal_bersih' => $bersih,
+                    'keterangan'     => $item['keterangan'] ?? null,
+                    'status_notifikasi' => 'belum',
+                ]);
+            }
         }
 
         DB::commit();
 
         return redirect()
             ->route('pencairan.index')
-            ->with('success', 'Import pencairan dana berhasil');
+            ->with('success', 'Import pencairan dana berhasil disimpan.');
 
     } catch (\Exception $e) {
 

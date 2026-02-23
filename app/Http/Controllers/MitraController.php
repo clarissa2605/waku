@@ -46,6 +46,7 @@ class MitraController extends Controller
             'status'         => 'required|in:aktif,nonaktif',
         ]);
 
+
         // 🔥 Normalisasi nomor WA
         if (!empty($validated['no_whatsapp'])) {
             $noWa = preg_replace('/[^0-9]/', '', $validated['no_whatsapp']);
@@ -63,6 +64,7 @@ class MitraController extends Controller
             ->route('mitra.index')
             ->with('success', 'Data mitra berhasil ditambahkan.');
     }
+
 
     /* ==============================
      * FORM EDIT
@@ -86,9 +88,6 @@ class MitraController extends Controller
             'nama_mitra'     => 'required|string|max:100',
             'no_whatsapp'    => 'nullable|string',
             'alamat'         => 'nullable|string',
-            'nama_bank'      => 'nullable|string|max:100',
-            'nama_rekening'  => 'nullable|string|max:100',
-            'no_rekening'    => 'nullable|digits_between:8,20',
             'jenis_mitra'    => 'nullable|string|max:100',
             'tanggal_mulai_kontrak'   => 'nullable|date',
             'tanggal_selesai_kontrak' => 'nullable|date',

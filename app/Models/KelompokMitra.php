@@ -18,8 +18,7 @@ class KelompokMitra extends Model
     ];
 
     /**
-     * 🔗 RELATIONSHIP
-     * Kelompok punya banyak mitra
+     * 🔗 Kelompok punya banyak mitra
      */
     public function mitra()
     {
@@ -31,5 +30,17 @@ class KelompokMitra extends Model
             'id_kelompok',
             'id_mitra'
         )->withTimestamps();
+    }
+
+    /**
+     * 🔗 Kelompok punya banyak pencairan
+     */
+    public function pencairan()
+    {
+        return $this->hasMany(
+            \App\Models\PencairanDanaMitra::class,
+            'kelompok_id',
+            'id_kelompok'
+        );
     }
 }

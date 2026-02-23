@@ -21,13 +21,52 @@
 
     @csrf
 
+    <!-- MODE -->
+    <label><b>Jenis Pencairan *</b></label><br>
+    <select name="mode" id="modeSelect" required>
+        <option value="pegawai">Pegawai</option>
+        <option value="mitra">Mitra</option>
+    </select>
+    <br><br>
+
     <label><b>Pilih File CSV</b></label><br>
     <input type="file" name="file" accept=".csv" required>
     <br><br>
 
     <button type="submit">📂 Import & Preview</button>
 </form>
+
 <br><br>
+
+<hr style="margin:25px 0;">
+
+<h3>📄 Petunjuk Format CSV</h3>
+
+<div id="formatPegawai">
+    <p><b>Format Pegawai:</b></p>
+    <code>
+        nip;tanggal;jenis_dana;nominal;potongan;nama_bank;nama_rekening;no_rekening;keterangan
+    </code>
+</div>
+
+<div id="formatMitra" style="display:none;">
+    <p><b>Format Mitra:</b></p>
+    <code>
+        nik;tanggal;jenis_dana;nominal;potongan;kelompok_id;nama_bank;nama_rekening;no_rekening;keterangan
+    </code>
+</div>
+
+<script>
+document.getElementById('modeSelect').addEventListener('change', function() {
+    if (this.value === 'mitra') {
+        document.getElementById('formatPegawai').style.display = 'none';
+        document.getElementById('formatMitra').style.display = 'block';
+    } else {
+        document.getElementById('formatPegawai').style.display = 'block';
+        document.getElementById('formatMitra').style.display = 'none';
+    }
+});
+</script>
 
 <a href="{{ route('pencairan.template') }}">
     📥 Download Template CSV

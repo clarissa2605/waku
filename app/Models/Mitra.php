@@ -15,14 +15,11 @@ class Mitra extends Model
         'nama_mitra',
         'no_whatsapp',
         'alamat',
-        'nama_bank',
-        'nama_rekening',
-        'no_rekening',
         'jenis_mitra',
         'tanggal_mulai_kontrak',
         'tanggal_selesai_kontrak',
         'keterangan',
-        'status'
+        'status',
     ];
 
     /**
@@ -40,4 +37,9 @@ class Mitra extends Model
             'id_kelompok'
         )->withTimestamps();
     }
+
+    public function pencairanMitra()
+{
+    return $this->hasMany(PencairanDanaMitra::class, 'mitra_id', 'id_mitra');
+}
 }

@@ -7,11 +7,14 @@
 <form method="POST" action="{{ route('pencairan.import.confirm') }}">
     @csrf
 
+    {{-- 🔥 WAJIB: KIRIM MODE --}}
+    <input type="hidden" name="mode" value="{{ $mode }}">
+
     <table border="1" cellpadding="6" cellspacing="0" width="100%">
         <tr style="background:#f2f2f2;">
             <th>No</th>
-            <th>NIP</th>
-            <th>Nama Pegawai</th>
+            <th>{{ $mode === 'pegawai' ? 'NIP' : 'NIK' }}</th>
+            <th>Nama</th>
             <th>Tanggal</th>
             <th>Jenis Dana</th>
             <th>Bank</th>
@@ -26,7 +29,7 @@
         @foreach ($rows as $i => $row)
             <tr style="{{ $row['valid'] ? '' : 'background:#ffe6e6' }}">
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $row['nip'] }}</td>
+                <td>{{ $row['identifier'] }}</td>
                 <td>{{ $row['nama'] }}</td>
                 <td>{{ $row['tanggal'] }}</td>
                 <td>{{ $row['jenis_dana'] }}</td>
@@ -47,10 +50,8 @@
                 </td>
             </tr>
 
-            {{-- ===============================
-                 HIDDEN INPUT (WAJIB LENGKAP)
-               =============================== --}}
-            <input type="hidden" name="data[{{ $i }}][nip]" value="{{ $row['nip'] }}">
+            {{-- 🔥 HIDDEN INPUT (WAJIB UNTUK CONFIRM) --}}
+            <input type="hidden" name="data[{{ $i }}][identifier]" value="{{ $row['identifier'] }}">
             <input type="hidden" name="data[{{ $i }}][tanggal]" value="{{ $row['tanggal'] }}">
             <input type="hidden" name="data[{{ $i }}][jenis_dana]" value="{{ $row['jenis_dana'] }}">
             <input type="hidden" name="data[{{ $i }}][nominal]" value="{{ $row['nominal'] }}">
@@ -60,6 +61,7 @@
             <input type="hidden" name="data[{{ $i }}][no_rekening]" value="{{ $row['no_rekening'] }}">
             <input type="hidden" name="data[{{ $i }}][keterangan]" value="{{ $row['keterangan'] }}">
             <input type="hidden" name="data[{{ $i }}][valid]" value="{{ $row['valid'] ? 1 : 0 }}">
+
         @endforeach
     </table>
 
@@ -67,6 +69,7 @@
 
     <button type="submit">✅ Konfirmasi & Simpan</button>
     <a href="{{ route('pencairan.import.form') }}">❌ Batal</a>
+
 </form>
 
 @endsection
