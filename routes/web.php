@@ -45,6 +45,9 @@ Route::prefix('admin')
         */
         Route::resource('pegawai', PegawaiController::class);
 
+        Route::patch('pegawai/{id}/toggle', [PegawaiController::class, 'toggleStatus'])
+            ->name('pegawai.toggle');
+
         Route::get('pegawai/{id}/user', [PegawaiController::class, 'createUser'])
             ->name('pegawai.user.create');
 

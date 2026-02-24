@@ -16,14 +16,36 @@ class PegawaiController extends Controller
      |  CRUD DATA PEGAWAI
      ===================================================== */
 
-    public function index(): View
-    {
-        $pegawai = Pegawai::where('status', 'aktif')
-            ->orderBy('nama')
-            ->get();
+        public function index(Request $request)
+        {
+            $query = Pegawai::with('user');
 
-        return view('admin_pegawai.index', compact('pegawai'));
-    }
+            // SEARCH
+            if ($request->search) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('nama', 'like', '%' . $request->search . '%')
+                    ->orWhere('nip', 'like', '%' . $request->search . '%');
+                });
+            }
+
+            // FILTER STATUS
+            if ($request->status) {
+                $query->where('status', $request->status);
+            }
+
+            // FILTER AKUN
+            if ($request->akun === 'ada') {
+                $query->whereHas('user');
+            }
+
+            if ($request->akun === 'belum') {
+                $query->whereDoesntHave('user');
+            }
+
+            $pegawai = $query->orderBy('nama')->get();
+
+            return view('admin_pegawai.index', compact('pegawai'));
+        }
 
     public function create(): View
     {
@@ -86,6 +108,19 @@ class PegawaiController extends Controller
         return redirect()
             ->route('pegawai.index')
             ->with('success', 'Pegawai dinonaktifkan');
+    }
+
+    public function toggleStatus($id)
+    {
+        $pegawai = Pegawai::findOrFail($id);
+
+        $pegawai->status = $pegawai->status === 'aktif'
+            ? 'nonaktif'
+            : 'aktif';
+
+        $pegawai->save();
+
+        return redirect()->back()->with('success', 'Status pegawai diperbarui.');
     }
 
     /* =====================================================
