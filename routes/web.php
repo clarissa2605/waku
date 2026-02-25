@@ -149,6 +149,9 @@ Route::prefix('admin')
         Route::resource('mitra', MitraController::class);
     });
 
+         Route::patch('/admin/mitra/{id}/toggle-status',  [MitraController::class, 'toggleStatus']
+         )->name('mitra.toggle-status');
+
 /*
 |--------------------------------------------------------------------------
 | API UTIL

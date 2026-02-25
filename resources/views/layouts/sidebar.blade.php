@@ -61,10 +61,11 @@
                     List Pegawai
                 </a>
 
-                <a href="{{ route('pegawai.create') }}"
-                   class="block py-2 text-slate-500 hover:text-blue-600">
-                    Tambah Pegawai
-                </a>
+            <a href="{{ route('pegawai.create') }}"
+            class="block py-2
+            {{ request()->routeIs('pegawai.create') ? 'text-blue-600 font-medium' : 'text-slate-500 hover:text-blue-600' }}">
+                Tambah Pegawai
+            </a>
             </div>
         </div>
 
@@ -85,12 +86,14 @@
 
             <div x-show="open" x-transition class="ml-10 mt-2 space-y-1">
                 <a href="{{ route('mitra.index') }}"
-                   class="block py-2 text-slate-500 hover:text-blue-600">
-                    List Mitra
+                            class="block py-2
+                            {{ request()->routeIs('mitra.index') ? 'text-blue-600 font-medium' : 'text-slate-500 hover:text-blue-600' }}">
+                                List Mitra
                 </a>
 
                 <a href="{{ route('mitra.create') }}"
-                   class="block py-2 text-slate-500 hover:text-blue-600">
+                   class="block py-2
+                   {{ request()->routeIs('mitra.create') ? 'text-blue-600 font-medium' : 'text-slate-500 hover:text-blue-600' }}">
                     Tambah Mitra
                 </a>
             </div>
@@ -98,7 +101,8 @@
 
         {{-- Kelompok Mitra --}}
         <a href="{{ route('kelompok.index') }}"
-           class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
+        class="flex items-center px-4 py-3 rounded-lg transition
+        {{ request()->routeIs('kelompok.*') ? 'bg-blue-50 text-blue-600 font-medium' : 'hover:bg-blue-50 text-slate-600' }}">
             <x-heroicon-o-users class="w-5 h-5 mr-3" />
             Kelompok Mitra
         </a>

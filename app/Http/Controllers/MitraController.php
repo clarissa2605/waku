@@ -3,19 +3,48 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mitra;
+use App\Models\KelompokMitra;
 use Illuminate\Http\Request;
 
 class MitraController extends Controller
 {
     /* ==============================
-     * LIST MITRA
+     * LIST MITRA + FILTER
      * ============================== */
-    public function index()
+    public function index(Request $request)
     {
-        $mitra = Mitra::orderBy('nama_mitra')
-            ->paginate(10);
+        $query = Mitra::with('kelompok');
 
-        return view('admin_mitra.index', compact('mitra'));
+        // ================= SEARCH =================
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_mitra', 'like', "%{$search}%")
+                  ->orWhere('nik', 'like', "%{$search}%");
+            });
+        }
+
+        // ================= FILTER STATUS =================
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // ================= FILTER KELOMPOK (MANY TO MANY) =================
+        if ($request->filled('kelompok')) {
+            $query->whereHas('kelompok', function ($q) use ($request) {
+                $q->where('id_kelompok', $request->kelompok);
+            });
+        }
+
+        $mitra = $query->orderBy('nama_mitra')
+                       ->paginate(10)
+                       ->withQueryString();
+
+        // Data untuk dropdown filter kelompok
+        $kelompokList = KelompokMitra::orderBy('nama_kelompok')->get();
+
+        return view('admin_mitra.index', compact('mitra', 'kelompokList'));
     }
 
     /* ==============================
@@ -46,8 +75,7 @@ class MitraController extends Controller
             'status'         => 'required|in:aktif,nonaktif',
         ]);
 
-
-        // 🔥 Normalisasi nomor WA
+        // Normalisasi nomor WA
         if (!empty($validated['no_whatsapp'])) {
             $noWa = preg_replace('/[^0-9]/', '', $validated['no_whatsapp']);
 
@@ -65,16 +93,26 @@ class MitraController extends Controller
             ->with('success', 'Data mitra berhasil ditambahkan.');
     }
 
-
     /* ==============================
      * FORM EDIT
      * ============================== */
     public function edit($id)
     {
-        $mitra = Mitra::findOrFail($id);
+        $mitra = Mitra::with('kelompok')->findOrFail($id);
+        $kelompokList = \App\Models\KelompokMitra::orderBy('nama_kelompok')->get();
 
-        return view('admin_mitra.edit', compact('mitra'));
+        return view('admin_mitra.edit', compact('mitra', 'kelompokList'));
     }
+
+    /* ==============================
+    * DETAIL MITRA
+    * ============================== */
+    public function show($id)
+    {
+        $mitra = Mitra::with('kelompok')->findOrFail($id);
+
+        return view('admin_mitra.show', compact('mitra'));
+}
 
     /* ==============================
      * UPDATE MITRA
@@ -115,11 +153,26 @@ class MitraController extends Controller
     /* ==============================
      * DELETE MITRA
      * ============================== */
-    public function destroy($id)
-    {
-        $mitra = Mitra::findOrFail($id);
-        $mitra->delete();
+public function destroy($id)
+{
+    $mitra = Mitra::findOrFail($id);
 
-        return back()->with('success', 'Data mitra berhasil dihapus.');
-    }
+    $mitra->status = 'nonaktif';
+    $mitra->save();
+
+    return back()->with('success', 'Mitra dinonaktifkan.');
+}
+
+    public function toggleStatus($id)
+{
+    $mitra = Mitra::findOrFail($id);
+
+    $mitra->status = $mitra->status === 'aktif' 
+        ? 'nonaktif' 
+        : 'aktif';
+
+    $mitra->save();
+
+    return back()->with('success', 'Status mitra berhasil diperbarui.');
+}
 }
