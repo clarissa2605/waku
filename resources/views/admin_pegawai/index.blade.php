@@ -98,7 +98,7 @@
                     <th class="py-3">No WhatsApp</th>
                     <th class="py-3">Status</th>
                     <th class="py-3">Akun Login</th>
-                    <th class="py-3 text-right">Aksi</th>
+                    <th class="py-3 text-center">Aksi</th>
                 </tr>
             </thead>
 

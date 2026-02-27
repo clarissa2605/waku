@@ -33,7 +33,7 @@ class KirimWhatsAppJob implements ShouldQueue
         // 🔒 LIMIT 20 PESAN PER JAM
         // ==============================
         $limitKey = 'wa_hourly_limit';
-        $maxPerHour = 20;
+        $maxPerHour = 40;
 
         $count = Cache::get($limitKey, 0);
 

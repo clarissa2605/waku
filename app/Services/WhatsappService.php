@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\Response;
 use App\Models\LogNotifikasi;
 
 class WhatsAppService
@@ -13,9 +14,9 @@ class WhatsAppService
 
         try {
 
-            // ==============================
-            // MODE SIMULASI
-            // ==============================
+            // ===================================
+            // MODE SIMULATION (AMAN UNTUK TEST)
+            // ===================================
             if ($mode === 'simulation') {
 
                 $status = 'success';
@@ -23,15 +24,16 @@ class WhatsAppService
 
             } else {
 
-                // ==============================
-                // MODE API (REAL)
-                // ==============================
+                // ===================================
+                // MODE REAL API (MEECHAT)
+                // ===================================
 
-                /** @var \Illuminate\Http\Client\Response $response */
+                /** @var Response $response */
                 $response = Http::withHeaders([
-                    'Authorization' => config('services.fonnte.api_key'),
-                ])->asForm()->post(config('services.fonnte.base_url'), [
-                    'target'  => $recipient->no_whatsapp,
+                    'Authorization' => 'Bearer ' . config('services.meechat.server_key'),
+                    'Content-Type'  => 'application/json',
+                ])->post(config('services.meechat.url'), [
+                    'number'  => $recipient->no_whatsapp,
                     'message' => $message,
                 ]);
 
@@ -39,6 +41,9 @@ class WhatsAppService
                 $responseBody = $response->body();
             }
 
+            // ===================================
+            // SIMPAN LOG
+            // ===================================
             LogNotifikasi::create([
                 'recipient_type' => get_class($recipient),
                 'recipient_id'   => $recipient->getKey(),

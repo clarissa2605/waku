@@ -1,90 +1,203 @@
 @extends('layouts.app')
 
 @section('content')
-<h1>Input Pencairan Dana Mitra</h1>
+<div class="max-w-5xl mx-auto">
 
-@if($errors->any())
-    <div style="color:red">
-        <ul>
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-slate-800">
+            Input Pencairan Dana Mitra
+        </h1>
+        <p class="text-sm text-slate-500 mt-1">
+            Input pencairan dana individu mitra berdasarkan kelompok.
+        </p>
     </div>
-@endif
 
-<form method="POST" action="{{ route('pencairan.mitra.store') }}">
-    @csrf
+    <!-- Error Alert -->
+    @if($errors->any())
+        <div class="mb-6 border border-red-200 bg-red-50 rounded-lg p-4">
+            <p class="text-sm font-medium text-red-700 mb-2">
+                Terjadi kesalahan:
+            </p>
+            <ul class="text-sm text-red-600 list-disc list-inside space-y-1">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    <!-- MITRA -->
-    <label>Mitra *</label><br>
-    <select name="mitra_id" id="mitraSelect" required>
-        <option value="">-- Pilih Mitra --</option>
-        @foreach($mitra as $m)
-            <option value="{{ $m->id_mitra }}">
-                {{ $m->nama_mitra }} ({{ $m->nik }})
-            </option>
-        @endforeach
-    </select>
-    <br><br>
+    <!-- Card -->
+    <div class="bg-white border border-slate-200 rounded-lg p-6">
 
-    <!-- KELOMPOK OTOMATIS -->
-    <label>Kelompok *</label><br>
-    <select name="kelompok_id" id="kelompokSelect" required>
-        <option value="">-- Pilih Mitra Dulu --</option>
-    </select>
-    <br><br>
+        <form method="POST" action="{{ route('pencairan.mitra.store') }}" class="space-y-6">
+            @csrf
 
-    <!-- JENIS -->
-    <label>Jenis Dana *</label><br>
-    <input type="text" name="jenis_dana" required>
-    <br><br>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    <!-- NOMINAL -->
-    <label>Nominal (Total) *</label><br>
-    <input type="number" name="nominal" id="nominal" min="1" required>
-    <br><br>
+                <!-- Mitra -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Mitra *
+                    </label>
+                    <select name="mitra_id"
+                            id="mitraSelect"
+                            required
+                            class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                   focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                        <option value="">-- Pilih Mitra --</option>
+                        @foreach($mitra as $m)
+                            <option value="{{ $m->id_mitra }}">
+                                {{ $m->nama_mitra }} ({{ $m->nik }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-    <!-- POTONGAN -->
-    <label>Potongan</label><br>
-    <input type="number" name="potongan" id="potongan" value="0" min="0">
-    <small>Isi 0 jika tidak ada potongan</small>
-    <br><br>
+                <!-- Kelompok -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Kelompok *
+                    </label>
+                    <select name="kelompok_id"
+                            id="kelompokSelect"
+                            required
+                            class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                   focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                        <option value="">-- Pilih Mitra Dulu --</option>
+                    </select>
+                </div>
 
-    <!-- REKENING DIINPUT SAAT PENCAIRAN -->
-    <label>Nama Bank *</label><br>
-    <input type="text" name="nama_bank" required>
-    <br><br>
+                <!-- Jenis Dana -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Jenis Dana *
+                    </label>
+                    <input type="text"
+                           name="jenis_dana"
+                           required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                  focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
 
-    <label>Nama Rekening *</label><br>
-    <input type="text" name="nama_rekening" required>
-    <br><br>
+                <!-- Nominal -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Nominal (Total) *
+                    </label>
+                    <input type="number"
+                           name="nominal"
+                           id="nominal"
+                           min="1"
+                           required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                  focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
 
-    <label>Nomor Rekening *</label><br>
-    <input type="text" name="no_rekening"
-           pattern="[0-9]*"
-           inputmode="numeric"
-           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-           required>
-    <br><br>
+                <!-- Potongan -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Potongan
+                    </label>
+                    <input type="number"
+                           name="potongan"
+                           id="potongan"
+                           value="0"
+                           min="0"
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                  focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                    <p class="text-xs text-slate-500 mt-1">
+                        Isi 0 jika tidak ada potongan.
+                    </p>
+                </div>
 
-    <!-- TANGGAL -->
-    <label>Tanggal *</label><br>
-    <input type="date" name="tanggal" required>
-    <br><br>
+                <!-- Nominal Bersih (Auto) -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Nominal Bersih
+                    </label>
+                    <input type="number"
+                           id="nominalBersih"
+                           readonly
+                           class="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-700">
+                </div>
 
-    <!-- KETERANGAN -->
-    <label>Keterangan</label><br>
-    <textarea name="keterangan"></textarea>
-    <br><br>
+                <!-- Nama Bank -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Nama Bank *
+                    </label>
+                    <input type="text"
+                           name="nama_bank"
+                           required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                  focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
 
-    <button type="submit">Simpan</button>
-</form>
+                <!-- Nama Rekening -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Nama Rekening *
+                    </label>
+                    <input type="text"
+                           name="nama_rekening"
+                           required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                  focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
 
+                <!-- Nomor Rekening -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Nomor Rekening *
+                    </label>
+                    <input type="text"
+                           name="no_rekening"
+                           pattern="[0-9]*"
+                           inputmode="numeric"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                           required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                  focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
 
-<!-- ===============================
-     SCRIPT FILTER KELOMPOK OTOMATIS
-================================ -->
+                <!-- Tanggal -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Tanggal *
+                    </label>
+                    <input type="date"
+                           name="tanggal"
+                           required
+                           class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                  focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                </div>
+
+                <!-- Keterangan -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Keterangan
+                    </label>
+                    <textarea name="keterangan"
+                              rows="3"
+                              class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                                     focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none"></textarea>
+                </div>
+
+            </div>
+
+            <div class="border-t border-slate-200 pt-6 flex justify-end">
+                <button type="submit"
+                        class="px-6 py-2.5 bg-blue-600 text-white text-sm font-medium
+                               rounded-lg hover:bg-blue-700 transition">
+                    Simpan Pencairan
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+</div>
 
 <script>
 document.getElementById('mitraSelect').addEventListener('change', function() {
@@ -117,16 +230,10 @@ document.getElementById('mitraSelect').addEventListener('change', function() {
             `;
         });
     })
-    .catch(error => {
+    .catch(() => {
         kelompokSelect.innerHTML = '<option value="">Error mengambil data</option>';
     });
-
 });
-
-
-/* ===============================
-   HITUNG NOMINAL BERSIH OTOMATIS
-================================ */
 
 document.getElementById('nominal').addEventListener('input', hitungBersih);
 document.getElementById('potongan').addEventListener('input', hitungBersih);

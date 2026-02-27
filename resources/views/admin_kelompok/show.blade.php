@@ -1,142 +1,217 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="max-w-7xl mx-auto">
 
-<h1 style="margin-bottom:20px;">Detail Kelompok Mitra</h1>
-
-{{-- ===============================
-     INFORMASI KELOMPOK
-================================ --}}
-<div style="margin-bottom:25px;">
-    <h2>{{ $kelompok->nama_kelompok }}</h2>
-    <p><strong>Kegiatan:</strong> {{ $kelompok->nama_kegiatan }}</p>
-    <p><strong>Tahun:</strong> {{ $kelompok->tahun }}</p>
-    @if($kelompok->keterangan)
-        <p><strong>Keterangan:</strong> {{ $kelompok->keterangan }}</p>
-    @endif
-</div>
-
-<hr>
-
-{{-- ===============================
-     STATISTIK
-================================ --}}
-<h3 style="margin-top:20px;">Statistik Kelompok</h3>
-
-<div style="display:flex; gap:20px; margin:20px 0; flex-wrap:wrap;">
-
-    <div style="flex:1; min-width:200px; padding:15px; background:#f5f5f5; border-radius:10px;">
-        <h4>Total Anggota</h4>
-        <h2>{{ $totalAnggota }}</h2>
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-slate-800">
+            Detail Kelompok Mitra
+        </h1>
+        <p class="text-sm text-slate-500 mt-1">
+            Informasi lengkap dan statistik kelompok mitra.
+        </p>
     </div>
 
-    <div style="flex:1; min-width:200px; padding:15px; background:#f5f5f5; border-radius:10px;">
-        <h4>Total Transaksi</h4>
-        <h2>{{ $totalTransaksi }}</h2>
+    <!-- Informasi Kelompok -->
+    <div class="bg-white border border-slate-200 rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">
+            {{ $kelompok->nama_kelompok }}
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+                <span class="text-slate-500">Kegiatan</span>
+                <p class="font-medium text-slate-800">{{ $kelompok->nama_kegiatan }}</p>
+            </div>
+
+            <div>
+                <span class="text-slate-500">Tahun</span>
+                <p class="font-medium text-slate-800">{{ $kelompok->tahun }}</p>
+            </div>
+
+            @if($kelompok->keterangan)
+            <div class="md:col-span-2">
+                <span class="text-slate-500">Keterangan</span>
+                <p class="text-slate-700">{{ $kelompok->keterangan }}</p>
+            </div>
+            @endif
+        </div>
     </div>
 
-    <div style="flex:1; min-width:200px; padding:15px; background:#f5f5f5; border-radius:10px;">
-        <h4>Total Nominal</h4>
-        <h2>Rp {{ number_format($totalNominal,0,',','.') }}</h2>
+    <!-- Statistik -->
+    <div class="mb-6">
+        <h3 class="text-lg font-semibold text-slate-800 mb-4">
+            Statistik Kelompok
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <div class="bg-white border border-slate-200 rounded-lg p-5">
+                <p class="text-sm text-slate-500">Total Anggota</p>
+                <p class="text-xl font-semibold text-slate-800 mt-2">
+                    {{ $totalAnggota }}
+                </p>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-lg p-5">
+                <p class="text-sm text-slate-500">Total Transaksi</p>
+                <p class="text-xl font-semibold text-slate-800 mt-2">
+                    {{ $totalTransaksi }}
+                </p>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-lg p-5">
+                <p class="text-sm text-slate-500">Total Nominal</p>
+                <p class="text-xl font-semibold text-slate-800 mt-2">
+                    Rp {{ number_format($totalNominal,0,',','.') }}
+                </p>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-lg p-5">
+                <p class="text-sm text-slate-500">Total Dana Bersih</p>
+                <p class="text-xl font-semibold text-slate-800 mt-2">
+                    Rp {{ number_format($totalDanaBersih,0,',','.') }}
+                </p>
+            </div>
+
+        </div>
     </div>
 
-    <div style="flex:1; min-width:200px; padding:15px; background:#f5f5f5; border-radius:10px;">
-        <h4>Total Dana Bersih</h4>
-        <h2>Rp {{ number_format($totalDanaBersih,0,',','.') }}</h2>
+    <!-- Daftar Anggota -->
+    <div class="bg-white border border-slate-200 rounded-lg overflow-hidden mb-6">
+
+        <div class="px-6 py-4 border-b border-slate-200">
+            <h3 class="text-lg font-semibold text-slate-800">
+                Daftar Anggota Kelompok
+            </h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr class="text-slate-500 text-left">
+                        <th class="px-6 py-4 font-medium">No</th>
+                        <th class="px-6 py-4 font-medium">Nama Mitra</th>
+                        <th class="px-6 py-4 font-medium">NIK</th>
+                        <th class="px-6 py-4 font-medium">No WhatsApp</th>
+                        <th class="px-6 py-4 font-medium">Status</th>
+                        <th class="px-6 py-4 font-medium text-center">Aksi</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-200">
+
+                @forelse($kelompok->mitra as $i => $m)
+                    <tr class="hover:bg-slate-50">
+
+                        <td class="px-6 py-4 text-slate-500">
+                            {{ $i + 1 }}
+                        </td>
+
+                        <td class="px-6 py-4 font-medium text-slate-800">
+                            {{ $m->nama_mitra }}
+                        </td>
+
+                        <td class="px-6 py-4 text-slate-600">
+                            {{ $m->nik }}
+                        </td>
+
+                        <td class="px-6 py-4 text-slate-600">
+                            {{ $m->no_whatsapp }}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            @if($m->status == 'aktif')
+                                <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-600">
+                                    Aktif
+                                </span>
+                            @else
+                                <span class="px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-600">
+                                    Nonaktif
+                                </span>
+                            @endif
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <div class="flex justify-center">
+                                <form method="POST"
+                                      action="{{ route('kelompok.removeMitra', [$kelompok->id_kelompok, $m->id_mitra]) }}"
+                                      onsubmit="return confirm('Yakin ingin menghapus mitra ini dari kelompok?')">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="submit"
+                                            class="font-semibold text-red-600 hover:text-red-800 transition">
+                                        Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6"
+                            class="px-6 py-12 text-center text-slate-500">
+                            Belum ada anggota dalam kelompok ini.
+                        </td>
+                    </tr>
+                @endforelse
+
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
-</div>
+    <!-- Tambah Anggota -->
+    <div class="bg-white border border-slate-200 rounded-lg p-6">
 
-<hr>
-
-{{-- ===============================
-     DAFTAR ANGGOTA
-================================ --}}
-<h3>Daftar Anggota Kelompok</h3>
-
-<table border="1" width="100%" cellpadding="6" cellspacing="0">
-    <tr style="background:#f2f2f2;">
-        <th>No</th>
-        <th>Nama Mitra</th>
-        <th>NIK</th>
-        <th>No WhatsApp</th>
-        <th>Status</th>
-        <th>Aksi</th>
-    </tr>
-
-    @forelse($kelompok->mitra as $i => $m)
-        <tr>
-            <td>{{ $i + 1 }}</td>
-            <td>{{ $m->nama_mitra }}</td>
-            <td>{{ $m->nik }}</td>
-            <td>{{ $m->no_whatsapp }}</td>
-            <td>
-                @if($m->status == 'aktif')
-                    <span style="color:green;">Aktif</span>
-                @else
-                    <span style="color:red;">Nonaktif</span>
-                @endif
-            </td>
-            <td>
-                <form method="POST"
-                      action="{{ route('kelompok.removeMitra', [$kelompok->id_kelompok, $m->id_mitra]) }}"
-                      onsubmit="return confirm('Yakin ingin menghapus mitra ini dari kelompok?')">
-                    @csrf
-                    @method('DELETE')
-
-                    <button type="submit" style="background:red; color:white;">
-                        Hapus
-                    </button>
-                </form>
-            </td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="6" style="text-align:center;">Belum ada anggota</td>
-        </tr>
-    @endforelse
-</table>
-
-<br>
-
-{{-- ===============================
-     TOMBOL TAMBAH ANGGOTA
-================================ --}}
-<button onclick="toggleForm()" 
-        style="padding:8px 15px; background:#007bff; color:white; border:none; border-radius:5px;">
-    ➕ Tambah Anggota
-</button>
-
-<div id="formTambah" style="display:none; margin-top:20px; max-width:400px;">
-
-    <input type="text" id="searchMitra"
-           placeholder="Cari nama atau NIK..."
-           style="width:100%; padding:8px; margin-bottom:10px;">
-
-    <div id="searchResult"
-         style="border:1px solid #ddd; border-radius:5px; max-height:200px; overflow-y:auto;">
-    </div>
-
-    <form method="POST" action="{{ route('kelompok.addMitra', $kelompok->id_kelompok) }}">
-        @csrf
-        <input type="hidden" name="mitra_id" id="selectedMitra">
-        <button type="submit"
-                style="margin-top:10px; padding:6px 12px; background:green; color:white; border:none; border-radius:5px;">
-            Simpan
+        <button onclick="toggleForm()"
+                class="inline-flex items-center gap-2 px-4 py-2.5
+                       bg-blue-600 text-white text-sm font-medium
+                       rounded-lg hover:bg-blue-700 transition">
+            ➕ Tambah Anggota
         </button>
-    </form>
+
+        <div id="formTambah" class="hidden mt-6 max-w-md">
+
+            <input type="text"
+                   id="searchMitra"
+                   placeholder="Cari nama atau NIK..."
+                   class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
+                          focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+
+            <div id="searchResult"
+                 class="border border-slate-200 rounded-lg mt-2 max-h-48 overflow-y-auto">
+            </div>
+
+            <form method="POST"
+                  action="{{ route('kelompok.addMitra', $kelompok->id_kelompok) }}">
+                @csrf
+
+                <input type="hidden" name="mitra_id" id="selectedMitra">
+
+                <button type="submit"
+                        class="mt-4 px-4 py-2 bg-green-500 text-white text-sm font-medium rounded-lg hover:bg-green-600 transition">
+                    Simpan
+                </button>
+            </form>
+        </div>
+
+    </div>
+
 </div>
 
 <script>
-
 function toggleForm() {
     const form = document.getElementById('formTambah');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    form.classList.toggle('hidden');
 }
 
-// Data mitra dari backend
 const mitraData = @json($mitra);
-
 const searchInput = document.getElementById('searchMitra');
 const resultBox = document.getElementById('searchResult');
 const hiddenInput = document.getElementById('selectedMitra');
@@ -156,13 +231,11 @@ searchInput.addEventListener('input', function() {
     filtered.forEach(m => {
 
         const div = document.createElement('div');
-        div.style.padding = '8px';
-        div.style.cursor = 'pointer';
-        div.style.borderBottom = '1px solid #eee';
+        div.className = 'px-4 py-2 cursor-pointer hover:bg-slate-50 border-b border-slate-200 text-sm';
 
         div.innerHTML = `
-            <strong>${m.nama_mitra}</strong><br>
-            <small>${m.nik}</small>
+            <div class="font-medium text-slate-800">${m.nama_mitra}</div>
+            <div class="text-slate-500 text-xs">${m.nik}</div>
         `;
 
         div.onclick = function() {
@@ -176,7 +249,6 @@ searchInput.addEventListener('input', function() {
     });
 
 });
-
 </script>
 
 @endsection

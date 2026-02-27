@@ -10,27 +10,34 @@
 
 <body class="bg-slate-50 text-slate-800">
 
-<div class="flex min-h-screen">
+<div class="min-h-screen">
 
     {{-- SIDEBAR --}}
-    @include('layouts.sidebar')
+    <aside class="w-64 bg-white border-r border-slate-200
+                  fixed inset-y-0 left-0 overflow-y-auto">
+        @include('layouts.sidebar')
+    </aside>
 
     {{-- MAIN CONTENT --}}
-    <main class="flex-1 p-10">
+    <main class="ml-64 min-h-screen">
 
-        {{-- Page Header --}}
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-semibold text-slate-800">
-                @yield('title')
-            </h1>
+        <div class="p-10">
 
-            <div class="text-sm text-slate-500">
-                {{ now()->format('d M Y') }}
+            {{-- Page Header --}}
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-semibold text-slate-800">
+                    @yield('title')
+                </h1>
+
+                <div class="text-sm text-slate-500">
+                    {{ now()->format('d M Y') }}
+                </div>
             </div>
-        </div>
 
-        {{-- Page Content --}}
-        @yield('content')
+            {{-- Page Content --}}
+            @yield('content')
+
+        </div>
 
     </main>
 

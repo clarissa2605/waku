@@ -92,6 +92,9 @@ Route::prefix('admin')
 
         Route::get('pencairan/template', [PencairanDanaController::class, 'downloadTemplate'])
             ->name('pencairan.template');
+        
+        Route::post('pencairan/bulk-send', [PencairanDanaController::class, 'bulkSend'])
+            ->name('pencairan.bulk_send');
 
         /*
         |--------------------------------------------------------------------------
@@ -151,6 +154,8 @@ Route::prefix('admin')
 
          Route::patch('/admin/mitra/{id}/toggle-status',  [MitraController::class, 'toggleStatus']
          )->name('mitra.toggle-status');
+
+         
 
 /*
 |--------------------------------------------------------------------------
