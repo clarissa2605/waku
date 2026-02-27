@@ -15,16 +15,31 @@
 
     <!-- Filter Card -->
     <div class="bg-white border border-slate-200 rounded-lg p-6 mb-6">
-        <form method="GET" class="grid md:grid-cols-4 gap-4">
+       <form method="GET" class="grid md:grid-cols-5 gap-4">
 
             <!-- Mode -->
             <div>
                 <label class="text-sm text-slate-500">Mode</label>
-                <select name="mode"
+                <select id="modeSelect" name="mode"
                         class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Semua</option>
-                    <option value="pegawai">Pegawai</option>
-                    <option value="mitra">Mitra</option>
+                    <option value="pegawai" {{ request('mode') == 'pegawai' ? 'selected' : '' }}>Pegawai</option>
+                    <option value="mitra" {{ request('mode') == 'mitra' ? 'selected' : '' }}>Mitra</option>
+                </select>
+            </div>
+
+            <!-- Kelompok -->
+            <div>
+                <label class="text-sm text-slate-500">Kelompok</label>
+                <select id="kelompokSelect" name="kelompok"
+                        class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Semua</option>
+                    @foreach($kelompokList as $k)
+                        <option value="{{ $k->id_kelompok }}"
+                            {{ request('kelompok') == $k->id_kelompok ? 'selected' : '' }}>
+                            {{ $k->nama_kelompok }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
@@ -34,10 +49,10 @@
                 <select name="status"
                         class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
                     <option value="">Semua</option>
-                    <option value="belum">Belum</option>
-                    <option value="antrian">Dalam Antrian</option>
-                    <option value="terkirim">Terkirim</option>
-                    <option value="gagal">Gagal</option>
+                    <option value="belum" {{ request('status')=='belum'?'selected':'' }}>Belum</option>
+                    <option value="antrian" {{ request('status')=='antrian'?'selected':'' }}>Dalam Antrian</option>
+                    <option value="terkirim" {{ request('status')=='terkirim'?'selected':'' }}>Terkirim</option>
+                    <option value="gagal" {{ request('status')=='gagal'?'selected':'' }}>Gagal</option>
                 </select>
             </div>
 
@@ -46,6 +61,7 @@
                 <label class="text-sm text-slate-500">Cari</label>
                 <input type="text"
                        name="search"
+                       value="{{ request('search') }}"
                        placeholder="Nama / NIP / NIK"
                        class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
             </div>
@@ -64,6 +80,7 @@
     <!-- Multi Action -->
     <form method="POST" action="{{ route('pencairan.bulk_send') }}">
         @csrf
+        <input type="hidden" name="mode" value="{{ request('mode') ?? 'pegawai' }}">
 
         <div class="mb-4 flex justify-between items-center">
 
@@ -76,7 +93,19 @@
             </div>
 
             <button type="submit"
-                    class="bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    class="flex items-center gap-2 bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+
+                <!-- Heroicon Paper Airplane -->
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="w-4 h-4"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M3 10l18-7-7 18-2-7-9-4z"/>
+                </svg>
+
                 Kirim WA Terpilih
             </button>
 
@@ -106,18 +135,23 @@
 
                         <tr class="hover:bg-slate-50">
 
-                            <!-- Checkbox -->
                             <td class="px-6 py-4">
                                 @if(in_array($p->status_notifikasi, ['belum','gagal']))
                                     <input type="checkbox"
                                            name="selected[]"
-                                           value="{{ $p->id_pencairan }}"
+                                           value="{{ request('mode') === 'mitra' 
+                                                ? $p->id_pencairan_mitra 
+                                                : $p->id_pencairan }}"
                                            class="rowCheckbox w-4 h-4 text-blue-600 border-slate-300 rounded">
                                 @endif
                             </td>
 
                             <td class="px-6 py-4 font-medium text-slate-800">
-                                {{ $p->pegawai->nama ?? '-' }}
+                                @if(request('mode') === 'mitra')
+                                    {{ $p->mitra->nama_mitra ?? '-' }}
+                                @else
+                                    {{ $p->pegawai->nama ?? '-' }}
+                                @endif
                             </td>
 
                             <td class="px-6 py-4 text-slate-600">
@@ -132,7 +166,6 @@
                                 Rp {{ number_format($p->nominal_bersih,0,',','.') }}
                             </td>
 
-                            <!-- Status -->
                             <td class="px-6 py-4 text-center">
                                 @switch($p->status_notifikasi)
 
@@ -163,13 +196,33 @@
                                 @endswitch
                             </td>
 
-                            <!-- Aksi -->
                             <td class="px-6 py-4 text-center">
                                 @if(in_array($p->status_notifikasi, ['belum','gagal']))
-                                    <a href="{{ route('pencairan.kirim_wa', $p->id_pencairan) }}"
-                                       class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                        Kirim WA
-                                    </a>
+
+                                    @php
+                                        $idRoute = request('mode') === 'mitra'
+                                            ? ($p->id_pencairan_mitra ?? null)
+                                            : ($p->id_pencairan ?? null);
+                                    @endphp
+
+                                    @if($idRoute)
+                                        <a href="{{ route('pencairan.kirim_wa', $idRoute) }}"
+                                        class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="w-4 h-4"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M3 10l18-7-7 18-2-7-9-4z"/>
+                                            </svg>
+
+                                            Kirim
+                                        </a>
+                                    @endif
+
                                 @else
                                     <span class="text-slate-400 text-sm">
                                         Diproses
@@ -192,12 +245,32 @@
 
 </div>
 
-<!-- Select All Script -->
 <script>
 document.getElementById('selectAll').addEventListener('change', function() {
     document.querySelectorAll('.rowCheckbox').forEach(cb => {
         cb.checked = this.checked;
     });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const modeSelect = document.getElementById('modeSelect');
+    const kelompokSelect = document.getElementById('kelompokSelect');
+
+    function toggleKelompok() {
+        if (modeSelect.value === 'mitra') {
+            kelompokSelect.disabled = false;
+            kelompokSelect.classList.remove('bg-slate-100','cursor-not-allowed');
+        } else {
+            kelompokSelect.disabled = true;
+            kelompokSelect.value = '';
+            kelompokSelect.classList.add('bg-slate-100','cursor-not-allowed');
+        }
+    }
+
+    toggleKelompok();
+    modeSelect.addEventListener('change', toggleKelompok);
+
 });
 </script>
 

@@ -19,14 +19,58 @@ class PencairanDanaController extends Controller
     /* =========================================================
      * DAFTAR PENCAIRAN DANA
      * ========================================================= */
-    public function index()
-    {
-        $pencairan = PencairanDana::with('pegawai')
-            ->orderBy('tanggal', 'desc')
-            ->get();
+public function index(Request $request)
+{
+    $mode = $request->mode ?? 'pegawai';
 
-        return view('admin_pencairan.index', compact('pencairan'));
+    if ($mode === 'mitra') {
+
+        $query = PencairanDanaMitra::with(['mitra.kelompok']);
+
+        // filter kelompok hanya untuk mitra
+        if ($request->kelompok) {
+            $query->where('kelompok_id', $request->kelompok);
+        }
+
+    } else {
+
+        $query = PencairanDana::with('pegawai');
     }
+
+    // filter status
+    if ($request->status) {
+        $query->where('status_notifikasi', $request->status);
+    }
+
+    // search
+    if ($request->search) {
+        $query->where(function ($q) use ($request, $mode) {
+
+            if ($mode === 'mitra') {
+                $q->whereHas('mitra', function ($sub) use ($request) {
+                    $sub->where('nama_mitra', 'like', '%' . $request->search . '%')
+                        ->orWhere('nik', 'like', '%' . $request->search . '%');
+                });
+            } else {
+                $q->whereHas('pegawai', function ($sub) use ($request) {
+                    $sub->where('nama', 'like', '%' . $request->search . '%')
+                        ->orWhere('nip', 'like', '%' . $request->search . '%');
+                });
+            }
+
+        });
+    }
+
+    $pencairan = $query->orderBy('tanggal', 'desc')->get();
+
+    $kelompokList = \App\Models\KelompokMitra::orderBy('nama_kelompok')->get();
+
+    return view('admin_pencairan.index', compact(
+        'pencairan',
+        'mode',
+        'kelompokList'
+    ));
+}
 
     /* =========================================================
      * FORM INPUT PENCAIRAN INDIVIDU
@@ -306,14 +350,23 @@ public function importConfirm(Request $request)
     /* =========================================================
      * KIRIM NOTIFIKASI WHATSAPP
      * ========================================================= */
-    public function kirimWA($id)
+public function kirimWA($id)
 {
     $pencairan = PencairanDana::findOrFail($id);
 
-    // Kirim ke queue (background)
-    KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
+    if (in_array($pencairan->status_notifikasi, ['belum', 'gagal'])) {
 
-    return back()->with('success', 'Pesan sedang diproses di background.');
+        // 🔥 ubah status jadi antrian dulu
+        $pencairan->update([
+            'status_notifikasi' => 'antrian'
+        ]);
+
+        KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
+
+        return back()->with('success', 'Pesan dimasukkan ke antrian.');
+    }
+
+    return back()->with('error', 'Pesan tidak bisa dikirim ulang.');
 }
 
     private function readCsv(Request $request): array
@@ -339,6 +392,44 @@ public function importConfirm(Request $request)
 
         return [$header, $rows];
     }
+
+/* =========================================================
+ * BULK SEND WHATSAPP
+ * ========================================================= */
+public function bulkSend(Request $request)
+{
+    $mode = $request->mode;
+    $ids  = $request->selected ?? [];
+
+    if (empty($ids)) {
+        return back()->with('error', 'Tidak ada data yang dipilih.');
+    }
+
+    if ($mode === 'mitra') {
+
+        $items = PencairanDanaMitra::whereIn('id_pencairan_mitra', $ids)
+            ->whereIn('status_notifikasi', ['belum', 'gagal'])
+            ->get();
+
+        foreach ($items as $item) {
+            $item->update(['status_notifikasi' => 'antrian']);
+            KirimWhatsAppJob::dispatch($item->id_pencairan_mitra);
+        }
+
+    } else {
+
+        $items = PencairanDana::whereIn('id_pencairan', $ids)
+            ->whereIn('status_notifikasi', ['belum', 'gagal'])
+            ->get();
+
+        foreach ($items as $item) {
+            $item->update(['status_notifikasi' => 'antrian']);
+            KirimWhatsAppJob::dispatch($item->id_pencairan);
+        }
+    }
+
+    return back()->with('success', 'Data berhasil dimasukkan ke antrian.');
+}
 
 /* =========================================================
  * RIWAYAT PENCAIRAN UNTUK PEGAWAI
@@ -466,5 +557,4 @@ public function dashboardViewer()
         'statusNotif'
     ));
 }
-
 }

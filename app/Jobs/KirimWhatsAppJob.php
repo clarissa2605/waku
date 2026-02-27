@@ -32,7 +32,7 @@ class KirimWhatsAppJob implements ShouldQueue
         // ==============================
         // 🔒 LIMIT 20 PESAN PER JAM
         // ==============================
-        $limitKey = 'wa_hourly_limit';
+        $limitKey = 'wa_hourly_limit_' . now()->format('YmdH');
         $maxPerHour = 40;
 
         $count = Cache::get($limitKey, 0);
@@ -51,6 +51,15 @@ class KirimWhatsAppJob implements ShouldQueue
         // ==============================
         $pencairan = PencairanDana::with('pegawai')
             ->find($this->pencairanId);
+
+        if (!$pencairan) {
+            return;
+        }
+
+        // ubah status jadi diproses
+        $pencairan->update([
+            'status_notifikasi' => 'diproses'
+        ]);
 
         if (!$pencairan || !$pencairan->pegawai) {
             return;
