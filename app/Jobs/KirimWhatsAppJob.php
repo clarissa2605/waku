@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Models\PencairanDana;
 use App\Services\WhatsAppService;
-use App\Services\WhatsAppTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -74,11 +73,28 @@ class KirimWhatsAppJob implements ShouldQueue
             return;
         }
 
-        $pesan = WhatsAppTemplate::pencairanDana($pencairan);
+// ==============================
+// Siapkan parameter template
+// ==============================
 
-        // 🔥 PANGGIL SERVICE BARU
-        $kirim = $waService->send($pegawai, $pesan);
+$params = [
+    $pegawai->nama,                                // {{1}}
+    $pencairan->jenis_dana,                        // {{2}}
+    $pencairan->nama_bank,                         // {{3}}
+    $pencairan->nama_rekening,                     // {{4}}
+    $pencairan->no_rekening,                       // {{5}}
+    number_format($pencairan->nominal, 0, ',', '.'), // {{6}}
+    number_format($pencairan->potongan ?? 0, 0, ',', '.'), // {{7}}
+    number_format($pencairan->nominal_bersih, 0, ',', '.'),   // {{8}}
+    $pencairan->tanggal,                           // {{9}}
+];
 
+// Kirim template ke MeeChat
+$kirim = $waService->sendTemplate(
+    $pegawai,
+    '499_client_notifikasi_waku_fix',
+    $params
+);
         if ($kirim['status'] === 'success') {
 
             $pencairan->update([

@@ -8,49 +8,39 @@ use App\Models\LogNotifikasi;
 
 class WhatsAppService
 {
-    public function send($recipient, string $message): array
+    public function sendTemplate($recipient, string $templateName, array $params): array
     {
-        $mode = env('WA_MODE', 'simulation');
-
         try {
 
-            // ===================================
-            // MODE SIMULATION (AMAN UNTUK TEST)
-            // ===================================
-            if ($mode === 'simulation') {
+            /** @var Response $response */
+            $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'X-API-KEY'    => 'Bearer ' . config('services.meechat.client_key'),
+            ])->post(
+                config('services.meechat.url') . '/v1/send-template',
+                [
+                    'name_template' => $templateName,
+                    'phone_number'  => $recipient->no_whatsapp,
+                    'language_code' => 'id',
+                    'body_params'   => $params,
+                ]
+            );
 
-                $status = 'success';
-                $responseBody = 'Simulasi terkirim ke ' . $recipient->no_whatsapp;
+            $statusCode = $response->status();
+            $isSuccess  = $response->successful();
 
-            } else {
+            $status = $isSuccess ? 'success' : 'failed';
 
-                // ===================================
-                // MODE REAL API (MEECHAT)
-                // ===================================
+            $responseBody = $response->body();
 
-                /** @var Response $response */
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . config('services.meechat.server_key'),
-                    'Content-Type'  => 'application/json',
-                ])->post(config('services.meechat.url'), [
-                    'number'  => $recipient->no_whatsapp,
-                    'message' => $message,
-                ]);
-
-                $status = $response->successful() ? 'success' : 'failed';
-                $responseBody = $response->body();
-            }
-
-            // ===================================
-            // SIMPAN LOG
-            // ===================================
+            // 🔎 DEBUG: simpan status code + response
             LogNotifikasi::create([
                 'recipient_type' => get_class($recipient),
                 'recipient_id'   => $recipient->getKey(),
                 'no_whatsapp'    => $recipient->no_whatsapp,
-                'pesan'          => $message,
+                'pesan'          => json_encode($params),
                 'status'         => $status,
-                'response'       => $responseBody,
+                'response'       => 'HTTP ' . $statusCode . ' - ' . $responseBody,
             ]);
 
             return [
@@ -60,13 +50,14 @@ class WhatsAppService
 
         } catch (\Throwable $e) {
 
+            // 🔥 Jika benar-benar error (timeout / crash)
             LogNotifikasi::create([
                 'recipient_type' => get_class($recipient),
                 'recipient_id'   => $recipient->getKey(),
-                'no_whatsapp'    => $recipient->no_whatsapp,
-                'pesan'          => $message,
+                'no_whatsapp'    => $recipient->no_whatsapp ?? '-',
+                'pesan'          => json_encode($params ?? []),
                 'status'         => 'error',
-                'response'       => $e->getMessage(),
+                'response'       => 'EXCEPTION: ' . $e->getMessage(),
             ]);
 
             return [

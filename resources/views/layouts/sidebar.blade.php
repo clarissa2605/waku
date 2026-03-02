@@ -189,9 +189,9 @@
             Communication
         </p>
 
-        <a href="#"
-           class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
-            <x-heroicon-o-chat-bubble-left-right class="w-5 h-5 mr-3" />
+        <a href="{{ route('log.notifikasi') }}"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-slate-100">
+            <x-heroicon-o-bell class="w-5 h-5 text-slate-500" />
             Log Notifikasi WA
         </a>
 

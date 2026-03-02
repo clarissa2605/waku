@@ -34,11 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-    
-    'fonnte' => [
-        'api_key'  => env('FONNTE_API_KEY'),
-        'base_url' => env('FONNTE_BASE_URL'),
-],
 
+        'meechat' => [
+        'url' => env('MEECHAT_URL', 'https://meechat.id/api'),
+        'client_key' => env('MEECHAT_CLIENT_KEY'),
+    ],
 
 ];

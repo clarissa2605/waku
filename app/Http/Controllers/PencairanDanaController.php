@@ -358,7 +358,7 @@ public function kirimWA($id)
 
         // 🔥 ubah status jadi antrian dulu
         $pencairan->update([
-            'status_notifikasi' => 'antrian'
+            'status_notifikasi' => 'diproses'
         ]);
 
         KirimWhatsAppJob::dispatch($pencairan->id_pencairan);

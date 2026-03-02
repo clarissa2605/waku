@@ -16,7 +16,7 @@ use App\Http\Controllers\MitraController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
 
 /*
@@ -150,10 +150,20 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
         Route::resource('mitra', MitraController::class);
-    });
 
-         Route::patch('/admin/mitra/{id}/toggle-status',  [MitraController::class, 'toggleStatus']
+        Route::patch('/admin/mitra/{id}/toggle-status',  [MitraController::class, 'toggleStatus']
          )->name('mitra.toggle-status');
+
+        /*
+        |--------------------------------------------------------------------------
+        | LOG NOTIFIKASI WA
+        |--------------------------------------------------------------------------
+        */
+        Route::get('log-notifikasi',
+            [\App\Http\Controllers\LogNotifikasiController::class, 'index']
+        )->name('log.notifikasi');
+
+        });
 
          
 
