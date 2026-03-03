@@ -29,10 +29,10 @@ class KirimWhatsAppJob implements ShouldQueue
     public function handle(WhatsAppService $waService): void
     {
         // ==============================
-        // 🔒 LIMIT 20 PESAN PER JAM
+        // 🔒 LIMIT 100 PESAN PER JAM
         // ==============================
         $limitKey = 'wa_hourly_limit_' . now()->format('YmdH');
-        $maxPerHour = 40;
+        $maxPerHour = 100;
 
         $count = Cache::get($limitKey, 0);
 

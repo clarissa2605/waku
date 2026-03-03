@@ -195,10 +195,10 @@
             Log Notifikasi WA
         </a>
 
-        <a href="#"
-           class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
-            <x-heroicon-o-envelope class="w-5 h-5 mr-3" />
-            Template Pesan
+        <a href="{{ route('template.index') }}"
+        class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
+            <x-heroicon-o-chat-bubble-left-right class="w-5 h-5 mr-3" />
+            Template Pesan WA
         </a>
 
         {{-- ================= REPORTING ================= --}}

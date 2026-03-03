@@ -163,6 +163,23 @@ Route::prefix('admin')
             [\App\Http\Controllers\LogNotifikasiController::class, 'index']
         )->name('log.notifikasi');
 
+        /*
+        |--------------------------------------------------------------------------
+        | Template Pesan WA
+        |--------------------------------------------------------------------------
+        */
+        Route::get('template-pesan', function () { return view('admin.admin_template.index');
+        })->name('template.index');
+
+        /*
+        |--------------------------------------------------------------------------
+        | MEECHAT API MONITORING
+        |--------------------------------------------------------------------------
+        */
+        Route::get('meechat/saldo',
+            [\App\Http\Controllers\MeechatController::class, 'saldo']
+        )->name('meechat.saldo');
+        
         });
 
          
