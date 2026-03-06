@@ -8,6 +8,8 @@ use App\Http\Controllers\PencairanDanaController;
 use App\Http\Controllers\KelompokMitraController;
 use App\Http\Controllers\PencairanDanaMitraController;
 use App\Http\Controllers\MitraController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,9 +36,8 @@ Route::prefix('admin')
         | DASHBOARD
         |--------------------------------------------------------------------------
         */
-        Route::get('/dashboard', function () {
-            return view('dashboard');
-        })->name('admin.dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+         ->name('admin.dashboard');
 
         /*
         |--------------------------------------------------------------------------
@@ -179,8 +180,21 @@ Route::prefix('admin')
         Route::get('meechat/saldo',
             [\App\Http\Controllers\MeechatController::class, 'saldo']
         )->name('meechat.saldo');
-        
-        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | LAPORAN
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get('/laporan', [LaporanController::class,'index'])
+            ->name('laporan.index');
+
+        Route::get('/laporan/export/pdf',[LaporanController::class,'exportPdf'])
+            ->name('laporan.export.pdf');
+
+});
+    
 
          
 

@@ -206,7 +206,7 @@
             Reporting
         </p>
 
-        <a href="#"
+        <a href="{{ route('laporan.index') }}"
            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
             <x-heroicon-o-chart-bar class="w-5 h-5 mr-3" />
             Laporan

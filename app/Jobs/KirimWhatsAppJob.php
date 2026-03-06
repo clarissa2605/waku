@@ -92,7 +92,7 @@ $params = [
 // Kirim template ke MeeChat
 $kirim = $waService->sendTemplate(
     $pegawai,
-    '499_client_notifikasi_waku_fix',
+    '499_client_wakuforwa_notifikasi_fix',
     $params
 );
         if ($kirim['status'] === 'success') {
