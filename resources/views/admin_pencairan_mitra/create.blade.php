@@ -27,6 +27,30 @@
         </div>
     @endif
 
+    <!-- Success Alert -->
+@if(session('success'))
+<div class="mb-6 border border-green-200 bg-green-50 rounded-lg p-4 flex items-center justify-between">
+
+    <div class="flex items-center gap-2 text-green-700 text-sm">
+        <!-- Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M5 13l4 4L19 7" />
+        </svg>
+
+        <span>
+            {{ session('success') }}
+        </span>
+    </div>
+
+    <a href="{{ route('pencairan.index', ['mode'=>'mitra']) }}"
+       class="text-blue-600 text-sm font-medium hover:underline">
+        Lihat Riwayat
+    </a>
+
+</div>
+@endif
+
     <!-- Card -->
     <div class="bg-white border border-slate-200 rounded-lg p-6">
 

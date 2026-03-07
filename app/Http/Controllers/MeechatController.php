@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\JsonResponse;
+use App\Helpers\LogHelper;
 
 class MeechatController extends Controller
 {
@@ -25,7 +26,12 @@ class MeechatController extends Controller
             }
 
             $data = $response->json();
-
+            
+            LogHelper::simpan(
+    'Cek Saldo Meechat',
+    'WhatsApp API',
+    'Admin mengecek saldo API Meechat'
+);
             return response()->json([
                 'success' => true,
                 'saldo' => $data['balance'] ?? 0,

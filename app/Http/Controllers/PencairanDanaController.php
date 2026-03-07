@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\KirimWhatsAppJob;
 use App\Models\LogPencairan;
 use App\Models\PencairanDanaMitra;
+use App\Helpers\LogHelper;
 
 
 class PencairanDanaController extends Controller
@@ -143,14 +144,19 @@ public function index(Request $request)
         'deskripsi'    => 'Pencairan dana dibuat oleh admin',
         ]);
 
+        LogHelper::simpan(
+    'Input Pencairan Dana',
+    'Pencairan Pegawai',
+    'Pencairan dana untuk '.$pegawai->nama.' sebesar Rp '.number_format($nominal,0,',','.')
+);
 
         // Generate pesan WA
         $pesanWa = WhatsAppTemplate::pencairanDana($pencairan);
         // logger($pesanWa);
 
         return redirect()
-            ->route('pencairan.index')
-            ->with('success', 'Pencairan dana berhasil disimpan');
+    ->route('pencairan.create')
+    ->with('success', 'Detail pencairan dana sudah tersimpan. Silahkan lihat di halaman Riwayat Pencairan.');
     }
 
     /* =========================================================
@@ -320,9 +326,15 @@ public function importConfirm(Request $request)
 
         DB::commit();
 
+            LogHelper::simpan(
+            'Import Pencairan Dana',
+            'Pencairan',
+            'Admin melakukan import pencairan dana via CSV'
+        );
+
         return redirect()
-            ->route('pencairan.index')
-            ->with('success', 'Import pencairan dana berhasil disimpan.');
+        ->route('pencairan.import.form')
+        ->with('success', 'Pencairan dana massal berhasil diimport. Silakan lihat pada halaman Riwayat Pencairan.');
 
     } catch (\Exception $e) {
 
@@ -362,6 +374,12 @@ public function kirimWA($id)
         ]);
 
         KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
+
+        LogHelper::simpan(
+    'Kirim Notifikasi WA',
+    'Notifikasi',
+    'Notifikasi pencairan dikirim ke '.$pencairan->pegawai->nama
+);
 
         return back()->with('success', 'Pesan dimasukkan ke antrian.');
     }
@@ -428,6 +446,12 @@ public function bulkSend(Request $request)
         }
     }
 
+    LogHelper::simpan(
+    'Bulk Send WhatsApp',
+    'Notifikasi',
+    'Admin mengirim notifikasi WhatsApp massal untuk pencairan dana'
+);
+
     return back()->with('success', 'Data berhasil dimasukkan ke antrian.');
 }
 
@@ -460,45 +484,83 @@ public function dashboardPegawai()
 /* =========================================================
  * DOWNLOAD TEMPLATE CSV
  * ========================================================= */
-public function downloadTemplate()
+public function downloadTemplate(Request $request)
 {
-    $filename = "template_import_pencairan_dana.csv";
+    $mode = $request->mode ?? 'pegawai';
+
+    if ($mode === 'mitra') {
+
+        $filename = "template_pencairan_mitra.csv";
+
+        $columns = [
+            'nik',
+            'tanggal',
+            'jenis_dana',
+            'nominal',
+            'potongan',
+            'kelompok_id',
+            'nama_bank',
+            'nama_rekening',
+            'no_rekening',
+            'keterangan'
+        ];
+
+        $dummy = [
+            '1234567890123456',
+            '2024-07-01',
+            'Honor Mitra',
+            '500000',
+            '0',
+            '1',
+            'BRI',
+            'BUDI SANTOSO',
+            '1234567890',
+            'Honor kegiatan survei'
+        ];
+
+    } else {
+
+        $filename = "template_pencairan_pegawai.csv";
+
+        $columns = [
+            'nip',
+            'tanggal',
+            'jenis_dana',
+            'nominal',
+            'potongan',
+            'nama_bank',
+            'nama_rekening',
+            'no_rekening',
+            'keterangan'
+        ];
+
+        $dummy = [
+            '198712312020121001',
+            '2024-07-01',
+            'Tunjangan Kinerja',
+            '5000000',
+            '0',
+            'MANDIRI',
+            'ANDI SAPUTRA',
+            '9876543210',
+            'Tunjangan bulan Juli'
+        ];
+    }
 
     $headers = [
         "Content-Type" => "text/csv",
         "Content-Disposition" => "attachment; filename=\"$filename\"",
     ];
 
-    $columns = [
-        'nip',
-        'tanggal',
-        'jenis_dana',
-        'nominal',
-        'potongan',
-        'nama_bank',
-        'nama_rekening',
-        'no_rekening',
-        'keterangan'
-    ];
+    $callback = function () use ($columns, $dummy) {
 
-    $callback = function () use ($columns) {
         $file = fopen('php://output', 'w');
 
-        // Header CSV
+        // Header
         fputcsv($file, $columns, ';');
 
-        // Contoh 1 baris dummy
-        fputcsv($file, [
-            '123456789012345678',
-            '2024-07-01',
-            'Tunjangan Kinerja',
-            '5000000',
-            '0',
-            'BRI',
-            'JOHN DOE',
-            '1234567890',
-            'Tunjangan bulan Juli'
-        ], ';');
+        // Dummy row
+        fputcsv($file, $dummy, ';');
 
         fclose($file);
     };

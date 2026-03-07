@@ -1,4 +1,4 @@
-<aside class="w-72 bg-white border-r border-slate-200 flex flex-col">
+<aside class="w-72 bg-white border-r border-slate-200 flex flex-col h-screen overflow-y-auto overflow-x-hidden">
 
     <!-- Logo -->
     <div class="px-6 py-6 border-b border-slate-200">
@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <nav class="flex-1 px-4 py-6 text-sm space-y-2 overflow-y-auto">
+    <nav class="flex-1 px-4 py-6 text-sm space-y-2">
 
         {{-- ================= DASHBOARD ================= --}}
         <a href="{{ route('admin.dashboard') }}"
@@ -43,16 +43,16 @@
         {{-- Pegawai --}}
         <div x-data="{ open: {{ request()->routeIs('pegawai.*') ? 'true' : 'false' }} }">
             <button @click="open = !open"
-                class="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
+                class="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
 
                 <div class="flex items-center">
                     <x-heroicon-o-user class="w-5 h-5 mr-3" />
                     Pegawai
                 </div>
 
-                <x-heroicon-o-chevron-down
-                    class="w-4 h-4 transition-transform"
-                    x-bind:class="open ? 'rotate-180' : ''" />
+               <x-heroicon-o-chevron-down
+    class="w-4 h-4 text-slate-400 transition-transform"
+    x-bind:class="open ? 'rotate-180' : ''" />
             </button>
 
             <div x-show="open" x-transition class="ml-10 mt-2 space-y-1">
@@ -80,8 +80,8 @@
                 </div>
 
                 <x-heroicon-o-chevron-down
-                    class="w-4 h-4 transition-transform"
-                    x-bind:class="open ? 'rotate-180' : ''" />
+    class="w-4 h-4 text-slate-400 transition-transform"
+    x-bind:class="open ? 'rotate-180' : ''" />
             </button>
 
             <div x-show="open" x-transition class="ml-10 mt-2 space-y-1">
@@ -124,9 +124,9 @@
                     Pencairan Individu
                 </div>
 
-                <x-heroicon-o-chevron-down
-                    class="w-4 h-4 transition-transform"
-                    x-bind:class="open ? 'rotate-180' : ''" />
+             <x-heroicon-o-chevron-down
+    class="w-4 h-4 text-slate-400 transition-transform"
+    x-bind:class="open ? 'rotate-180' : ''" />
             </button>
 
             <div x-show="open" x-transition class="ml-10 mt-2 space-y-1">
@@ -159,8 +159,8 @@
                 </div>
 
                 <x-heroicon-o-chevron-down
-                    class="w-4 h-4 transition-transform"
-                    x-bind:class="open ? 'rotate-180' : ''" />
+    class="w-4 h-4 text-slate-400 transition-transform"
+    x-bind:class="open ? 'rotate-180' : ''" />
             </button>
 
             <div x-show="open" x-transition class="ml-10 mt-2 space-y-1">
@@ -217,7 +217,7 @@
             System
         </p>
 
-        <a href="#"
+        <a href="{{ route('log.aktivitas') }}"
            class="flex items-center px-4 py-3 rounded-lg hover:bg-blue-50 text-slate-600 transition">
             <x-heroicon-o-document-text class="w-5 h-5 mr-3" />
             Log Aktivitas

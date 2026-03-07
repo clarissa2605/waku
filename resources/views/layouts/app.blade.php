@@ -9,18 +9,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-50 text-slate-800 h-screen overflow-hidden">
 
-<div class="min-h-screen">
+<div class="flex h-screen">
 
     {{-- SIDEBAR --}}
-    <aside class="w-64 bg-white border-r border-slate-200
-                  fixed inset-y-0 left-0 overflow-y-auto">
+    <aside class="w-64 bg-white border-r border-slate-200 fixed inset-y-0 left-0 overflow-y-auto overflow-x-hidden">
         @include('layouts.sidebar')
     </aside>
 
     {{-- MAIN CONTENT --}}
-    <main class="ml-64 min-h-screen">
+    <main class="ml-64 flex-1 overflow-y-auto">
 
         <div class="p-10">
 

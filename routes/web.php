@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PencairanDanaController;
 use App\Http\Controllers\KelompokMitraController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\PencairanDanaMitraController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LogAktivitasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -166,6 +168,15 @@ Route::prefix('admin')
 
         /*
         |--------------------------------------------------------------------------
+        | LOG AKTIVITAS SISTEM
+        |--------------------------------------------------------------------------
+        */
+        Route::get('log-aktivitas',
+            [LogAktivitasController::class, 'index']
+        )->name('log.aktivitas');
+
+        /*
+        |--------------------------------------------------------------------------
         | Template Pesan WA
         |--------------------------------------------------------------------------
         */
@@ -247,10 +258,40 @@ require __DIR__ . '/auth.php';
 |--------------------------------------------------------------------------
 */
 
+
 Route::middleware('auth')->group(function () {
+
     Route::get('/profile', function () {
         return view('profile.edit');
     })->name('profile.edit');
+
+    Route::post('/profile/update-password', function (Request $request) {
+
+    $request->validate([
+        'password' => [
+            'required',
+            'min:8',
+            'regex:/[A-Z]/',
+            'regex:/[0-9]/',
+            'confirmed'
+        ]
+    ],[
+        'password.required' => 'Password wajib diisi.',
+        'password.min' => 'Password minimal 8 karakter.',
+        'password.regex' => 'Password harus mengandung huruf besar dan angka.',
+        'password.confirmed' => 'Konfirmasi password tidak cocok.'
+    ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Password berhasil diperbarui.');
+
+    })->name('profile.password.update');
+
 });
 
 Route::get('/whoami', function () {

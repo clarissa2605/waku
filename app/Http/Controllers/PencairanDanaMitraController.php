@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Mitra;
 use App\Models\PencairanDanaMitra;
 use Illuminate\Http\Request;
+use App\Helpers\LogHelper;
 
 class PencairanDanaMitraController extends Controller
 {
@@ -58,7 +59,7 @@ public function create()
     $potongan = $validated['potongan'] ?? 0;
     $bersih = $validated['nominal'] - $potongan;
 
-    PencairanDanaMitra::create([
+    $pencairan = PencairanDanaMitra::create([
         'mitra_id'       => $validated['mitra_id'],
         'kelompok_id'    => $validated['kelompok_id'] ?? null,
         'jenis_dana'     => $validated['jenis_dana'],
@@ -75,8 +76,14 @@ public function create()
         'status_notifikasi' => 'belum'
     ]);
 
+    LogHelper::simpan(
+    'Input Pencairan Mitra',
+    'Pencairan Mitra',
+    'Pencairan dana mitra sebesar Rp '.number_format($bersih,0,',','.')
+);
+
     return redirect()
-        ->route('pencairan.mitra.index')
-        ->with('success', 'Pencairan dana mitra berhasil disimpan.');
+    ->route('pencairan.mitra.create')
+    ->with('success', 'Detail pencairan dana sudah tersimpan. Silahkan lihat di halaman Riwayat Pencairan.');
 }
 }

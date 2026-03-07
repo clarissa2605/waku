@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Http\Controllers\Controller;
-
+use App\Helpers\LogHelper;
 class PegawaiController extends Controller
 {
     /* =====================================================
@@ -63,13 +63,19 @@ class PegawaiController extends Controller
         'no_whatsapp.regex' => 'Nomor WhatsApp harus diawali 62 dan tanpa spasi. Contoh: 628123456789',
     ]);
 
-    Pegawai::create([
+    $pegawai = Pegawai::create([
         'nip'            => $request->nip,
         'nama'           => $request->nama,
         'unit_kerja'     => $request->unit_kerja,
         'no_whatsapp'    => $request->no_whatsapp, // FIXED
         'status'         => $request->status,
     ]);
+
+    LogHelper::simpan(
+    'Tambah Pegawai',
+    'Pegawai',
+    'Pegawai baru ditambahkan: '.$pegawai->nama
+);
 
     return redirect()
         ->route('pegawai.index')
@@ -95,6 +101,12 @@ class PegawaiController extends Controller
 
         $pegawai->update($validated);
 
+        LogHelper::simpan(
+    'Update Pegawai',
+    'Pegawai',
+    'Data pegawai diperbarui: '.$pegawai->nama
+);
+
         return redirect()
             ->route('pegawai.index')
             ->with('success', 'Data pegawai berhasil diperbarui');
@@ -104,6 +116,12 @@ class PegawaiController extends Controller
     {
         $pegawai = Pegawai::findOrFail($id);
         $pegawai->update(['status' => 'nonaktif']);
+
+        LogHelper::simpan(
+    'Nonaktifkan Pegawai',
+    'Pegawai',
+    'Pegawai dinonaktifkan: '.$pegawai->nama
+);
 
         return redirect()
             ->route('pegawai.index')
@@ -119,6 +137,12 @@ class PegawaiController extends Controller
             : 'aktif';
 
         $pegawai->save();
+
+        LogHelper::simpan(
+    'Update Status Pegawai',
+    'Pegawai',
+    'Status pegawai diubah menjadi '.$pegawai->status.' untuk '.$pegawai->nama
+);
 
         return redirect()->back()->with('success', 'Status pegawai diperbarui.');
     }
@@ -149,13 +173,19 @@ class PegawaiController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        User::create([
+        $user = User::create([
             'name'       => $pegawai->nama,
             'email'      => $request->email,
             'password'   => Hash::make($request->password),
             'pegawai_id' => $pegawai->id_pegawai,
             'role'       => 'pegawai',
         ]);
+
+        LogHelper::simpan(
+    'Buat Akun Pegawai',
+    'User Management',
+    'Akun login dibuat untuk pegawai '.$pegawai->nama
+);
 
         return redirect()
             ->route('pegawai.index')

@@ -13,6 +13,32 @@
         </p>
     </div>
 
+@if(session('success'))
+<div class="mb-6 border border-green-200 bg-green-50 rounded-lg p-4 flex justify-between items-center">
+
+    <div class="flex items-center gap-2 text-sm text-green-700">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-5 h-5"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7" />
+        </svg>
+
+        {{ session('success') }}
+    </div>
+
+    <a href="{{ route('pencairan.index') }}"
+       class="text-sm font-medium text-blue-600 hover:underline">
+        Lihat Riwayat
+    </a>
+
+</div>
+@endif
+
     <!-- Card -->
     <div class="bg-white border border-slate-200 rounded-lg p-6 mb-8">
 
@@ -65,7 +91,7 @@
    href="{{ route('pencairan.template', ['mode' => 'pegawai']) }}"
    class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition">
 
-    <!-- Heroicon: Arrow Down Tray -->
+    <!-- Icon -->
     <svg xmlns="http://www.w3.org/2000/svg"
          fill="none"
          viewBox="0 0 24 24"
@@ -77,7 +103,10 @@
               d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 10.5L12 15m0 0l4.5-4.5M12 15V3" />
     </svg>
 
-    Download Template CSV (Pegawai)
+    <span id="templateText">
+        Download Template CSV (Pegawai)
+    </span>
+
 </a>
                         </div>
                     </div>
@@ -160,6 +189,7 @@
 <script>
 const modeSelect = document.getElementById('modeSelect');
 const templateLink = document.getElementById('templateLink');
+const templateText = document.getElementById('templateText');
 const formatPegawai = document.getElementById('formatPegawai');
 const formatMitra = document.getElementById('formatMitra');
 
@@ -167,16 +197,16 @@ modeSelect.addEventListener('change', function() {
 
     if (this.value === 'mitra') {
 
-        templateLink.href = "{{ route('pencairan.template', ['mode' => 'mitra']) }}";
-        templateLink.innerText = "📥 Download Template CSV (Mitra)";
+        templateLink.href = "{{ route('pencairan.template') }}?mode=mitra";
+        templateText.innerText = "Download Template CSV (Mitra)";
 
         formatPegawai.classList.add('hidden');
         formatMitra.classList.remove('hidden');
 
     } else {
 
-        templateLink.href = "{{ route('pencairan.template', ['mode' => 'pegawai']) }}";
-        templateLink.innerText = "📥 Download Template CSV (Pegawai)";
+        templateLink.href = "{{ route('pencairan.template') }}?mode=pegawai";
+        templateText.innerText = "Download Template CSV (Pegawai)";
 
         formatPegawai.classList.remove('hidden');
         formatMitra.classList.add('hidden');

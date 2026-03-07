@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Helpers\LogHelper;
 
 class ProfileController extends Controller
 {
@@ -33,6 +34,12 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        LogHelper::simpan(
+    'Update Profil',
+    'Profile',
+    'User memperbarui profil akun'
+);
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

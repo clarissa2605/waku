@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\KelompokMitra;
 use Illuminate\Http\Request;
+use App\Helpers\LogHelper;
 
 class KelompokMitraController extends Controller
 {
@@ -51,6 +52,13 @@ public function show($id)
 
         $kelompok->mitra()->attach($request->mitra_id);
 
+         // LOG AKTIVITAS
+        LogHelper::simpan(
+            'Tambah Mitra ke Kelompok',
+            'Kelompok Mitra',
+            'Mitra ID '.$request->mitra_id.' ditambahkan ke kelompok '.$kelompok->nama_kelompok
+        );
+
         return redirect()->back()->with('success', 'Mitra berhasil ditambahkan ke kelompok.');
     }
 
@@ -62,6 +70,13 @@ public function show($id)
         $kelompok = KelompokMitra::findOrFail($kelompokId);
 
         $kelompok->mitra()->detach($mitraId);
+
+        // LOG AKTIVITAS
+        LogHelper::simpan(
+            'Hapus Mitra dari Kelompok',
+            'Kelompok Mitra',
+            'Mitra ID '.$mitraId.' dihapus dari kelompok '.$kelompok->nama_kelompok
+        );
 
         return redirect()->back()->with('success', 'Mitra berhasil dihapus dari kelompok.');
     }
@@ -100,6 +115,13 @@ public function store(Request $request)
 
     $kelompok = KelompokMitra::create($validated);
 
+    // LOG AKTIVITAS
+    LogHelper::simpan(
+        'Buat Kelompok Mitra',
+        'Kelompok Mitra',
+        'Kelompok dibuat: '.$kelompok->nama_kelompok
+    );
+
     return redirect()
         ->route('kelompok.show', $kelompok->id_kelompok)
         ->with('success', 'Kelompok berhasil dibuat.');
@@ -123,6 +145,14 @@ public function update(Request $request, $id)
     $kelompok = KelompokMitra::findOrFail($id);
     $kelompok->update($validated);
 
+    // LOG AKTIVITAS
+    LogHelper::simpan(
+        'Update Kelompok Mitra',
+        'Kelompok Mitra',
+        'Kelompok diperbarui: '.$kelompok->nama_kelompok
+    );
+
+
     return redirect()
         ->route('kelompok.show', $kelompok->id_kelompok)
         ->with('success', 'Kelompok berhasil diperbarui.');
@@ -132,10 +162,19 @@ public function destroy($id)
 {
     $kelompok = KelompokMitra::findOrFail($id);
 
+    $namaKelompok = $kelompok->nama_kelompok;
+
     // Hapus relasi pivot dulu
     $kelompok->mitra()->detach();
 
     $kelompok->delete();
+
+    // LOG AKTIVITAS
+    LogHelper::simpan(
+        'Hapus Kelompok Mitra',
+        'Kelompok Mitra',
+        'Kelompok dihapus: '.$namaKelompok
+    );
 
     return redirect()
         ->route('kelompok.index')

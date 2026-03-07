@@ -164,8 +164,8 @@ thead{
 
 <tr>
 
-<td width="70">
-<img src="{{ public_path('logo-bps.png') }}" class="logo">
+<td width="80">
+<img src="{{ public_path('images/logoBps.png') }}" style="width:60px;">
 </td>
 
 <td>

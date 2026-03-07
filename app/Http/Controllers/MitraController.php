@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Mitra;
 use App\Models\KelompokMitra;
 use Illuminate\Http\Request;
+use App\Helpers\LogHelper;
 
 class MitraController extends Controller
 {
@@ -88,6 +89,13 @@ class MitraController extends Controller
 
         Mitra::create($validated);
 
+        // LOG AKTIVITAS
+        LogHelper::simpan(
+            'Tambah Mitra',
+            'Mitra',
+            'Mitra baru ditambahkan: '.$validated['nama_mitra']
+        );
+
         return redirect()
             ->route('mitra.index')
             ->with('success', 'Data mitra berhasil ditambahkan.');
@@ -145,6 +153,12 @@ class MitraController extends Controller
 
         $mitra->update($validated);
 
+        LogHelper::simpan(
+    'Update Mitra',
+    'Mitra',
+    'Data mitra diperbarui: '.$mitra->nama_mitra
+);
+
         return redirect()
             ->route('mitra.index')
             ->with('success', 'Data mitra berhasil diperbarui.');
@@ -160,6 +174,12 @@ public function destroy($id)
     $mitra->status = 'nonaktif';
     $mitra->save();
 
+    LogHelper::simpan(
+    'Nonaktifkan Mitra',
+    'Mitra',
+    'Mitra dinonaktifkan: '.$mitra->nama_mitra
+);
+
     return back()->with('success', 'Mitra dinonaktifkan.');
 }
 
@@ -172,6 +192,12 @@ public function destroy($id)
         : 'aktif';
 
     $mitra->save();
+
+    LogHelper::simpan(
+    'Update Status Mitra',
+    'Mitra',
+    'Status mitra diubah menjadi '.$mitra->status.' untuk '.$mitra->nama_mitra
+);
 
     return back()->with('success', 'Status mitra berhasil diperbarui.');
 }
