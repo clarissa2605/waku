@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Http\Controllers\Controller;
 use App\Helpers\LogHelper;
+use Illuminate\Support\Str; 
 class PegawaiController extends Controller
 {
     /* =====================================================
@@ -191,4 +192,32 @@ class PegawaiController extends Controller
             ->route('pegawai.index')
             ->with('success', 'Akun login pegawai berhasil dibuat');
     }
+
+  public function resetPassword(Request $request, User $user)
+{
+    $newPassword = Str::random(8);
+
+    $user->password = Hash::make($newPassword);
+    $user->save();
+
+    LogHelper::simpan(
+        'Reset Password Pegawai',
+        'User Management',
+        'Password direset untuk pegawai '.$user->name
+    );
+
+    // Jika request dari JS
+    if ($request->expectsJson()) {
+        return response()->json([
+            'password' => $newPassword,
+            'name' => $user->name // Tambahkan nama pegawai untuk konfirmasi
+        ]);
+    }
+
+    // Jika request normal
+    return redirect()->back()->with(
+        'success',
+        'Password berhasil direset. Password baru: '.$newPassword
+    );
+}
 }

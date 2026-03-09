@@ -204,6 +204,9 @@ Route::prefix('admin')
         Route::get('/laporan/export/pdf',[LaporanController::class,'exportPdf'])
             ->name('laporan.export.pdf');
 
+        Route::patch('pegawai/reset-password/{user}', [PegawaiController::class, 'resetPassword'])
+            ->name('pegawai.reset.password');
+
 });
     
 

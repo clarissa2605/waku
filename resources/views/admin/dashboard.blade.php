@@ -23,68 +23,100 @@
 
 <div class="grid grid-cols-4 gap-6 mb-8">
 
-    <div class="bg-white rounded-xl shadow-sm p-6 flex justify-between items-center">
+<!-- Pegawai -->
+<div class="rounded-2xl bg-blue-100 p-6 flex justify-between items-center shadow-sm">
 
-        <div>
-            <p class="text-sm text-slate-500">Total Pegawai</p>
-            <h2 class="text-2xl font-semibold mt-2">
-                {{ $totalPegawai }}
-            </h2>
-        </div>
+<div>
+<p class="text-sm text-slate-600">
+Total Pegawai
+</p>
 
-        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-            <x-heroicon-o-user class="w-6 h-6 text-blue-500"/>
-        </div>
+<h2 class="text-3xl font-bold text-slate-900 mt-2">
+{{ $totalPegawai }}
+</h2>
 
-    </div>
+<p class="text-xs text-blue-600 mt-1">
+Data pegawai aktif
+</p>
+</div>
 
+<div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center">
+<x-heroicon-o-user class="w-6 h-6 text-white"/>
+</div>
 
-    <div class="bg-white rounded-xl shadow-sm p-6 flex justify-between items-center">
-
-        <div>
-            <p class="text-sm text-slate-500">Total Mitra</p>
-            <h2 class="text-2xl font-semibold mt-2">
-                {{ $totalMitra }}
-            </h2>
-        </div>
-
-        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
-            <x-heroicon-o-user-group class="w-6 h-6 text-indigo-500" />
-        </div>
-
-    </div>
+</div>
 
 
-    <div class="bg-white rounded-xl shadow-sm p-6 flex justify-between items-center">
+<!-- Mitra -->
+<div class="rounded-2xl bg-yellow-100 p-6 flex justify-between items-center shadow-sm">
 
-        <div>
-            <p class="text-sm text-slate-500">Kelompok Mitra</p>
-            <h2 class="text-2xl font-semibold mt-2">
-                {{ $totalKelompok }}
-            </h2>
-        </div>
+<div>
+<p class="text-sm text-slate-600">
+Total Mitra
+</p>
 
-        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-            <x-heroicon-o-users class="w-6 h-6 text-purple-500"/>
-        </div>
+<h2 class="text-3xl font-bold text-slate-900 mt-2">
+{{ $totalMitra }}
+</h2>
 
-    </div>
+<p class="text-xs text-yellow-600 mt-1">
+Mitra terdaftar
+</p>
+</div>
+
+<div class="w-12 h-12 rounded-full bg-yellow-500 flex items-center justify-center">
+<x-heroicon-o-user-group class="w-6 h-6 text-white"/>
+</div>
+
+</div>
 
 
-    <div class="bg-white rounded-xl shadow-sm p-6 flex justify-between items-center">
+<!-- Kelompok -->
+<div class="rounded-2xl bg-green-100 p-6 flex justify-between items-center shadow-sm">
 
-        <div>
-            <p class="text-sm text-slate-500">Total Pencairan</p>
-            <h2 class="text-2xl font-semibold mt-2">
-                Rp {{ number_format($totalPencairan,0,',','.') }}
-            </h2>
-        </div>
+<div>
+<p class="text-sm text-slate-600">
+Kelompok Mitra
+</p>
 
-        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-            <x-heroicon-o-circle-stack class="w-6 h-6 text-slate-600"/>
-        </div>
+<h2 class="text-3xl font-bold text-slate-900 mt-2">
+{{ $totalKelompok }}
+</h2>
 
-    </div>
+<p class="text-xs text-green-600 mt-1">
+Kelompok aktif
+</p>
+</div>
+
+<div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
+<x-heroicon-o-users class="w-6 h-6 text-white"/>
+</div>
+
+</div>
+
+
+<!-- Pencairan -->
+<div class="rounded-2xl bg-purple-100 p-6 flex justify-between items-center shadow-sm">
+
+<div>
+<p class="text-sm text-slate-600">
+Total Pencairan
+</p>
+
+<h2 class="text-2xl font-bold text-slate-900 mt-2">
+Rp {{ number_format($totalPencairan,0,',','.') }}
+</h2>
+
+<p class="text-xs text-purple-600 mt-1">
+Dana tersalurkan
+</p>
+</div>
+
+<div class="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center">
+<x-heroicon-o-circle-stack class="w-6 h-6 text-white"/>
+</div>
+
+</div>
 
 </div>
 
@@ -130,33 +162,68 @@
 
 <!-- ================= GRAFIK MONITORING ================= -->
 
-<div class="grid grid-cols-2 gap-6 mb-10">
+<div class="grid grid-cols-[7fr_3fr] gap-6 mb-10">
 
-    <!-- Grafik Pencairan Dana -->
-    <div class="bg-white rounded-xl shadow-sm p-6">
+<!-- Grafik Pencairan Dana -->
+<div class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(0,0,0,0.05)] p-6">
 
-        <h2 class="font-semibold text-slate-700 mb-4">
-            Grafik Pencairan Dana
-        </h2>
+<div class="flex items-center justify-between mb-4">
 
-        <div class="h-[220px]">
-        <canvas id="chartPencairan"></canvas>
-        </div>
+<h2 class="font-semibold text-slate-700">
+Grafik Pencairan Dana
+</h2>
 
-    </div>
+<div class="flex gap-2">
 
+<button id="btn-bulan"
+onclick="updateChart('bulan')" 
+class="filter-btn px-3 py-1 text-xs rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+Bulan
+</button>
 
-    <!-- Grafik Status WhatsApp -->
-    <div class="bg-white rounded-xl shadow-sm p-6">
+<button id="btn-tahun"
+onclick="updateChart('tahun')" 
+class="filter-btn px-3 py-1 text-xs rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+Tahun
+</button>
 
-        <h2 class="font-semibold text-slate-700 mb-4">
-            Status Notifikasi WhatsApp
-        </h2>
+<button id="btn-semua"
+onclick="updateChart('semua')" 
+class="filter-btn px-3 py-1 text-xs rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+Semua
+</button>
 
-      <div class="h-[220px] flex justify-center items-center">
-    <canvas id="chartWA"></canvas>
 </div>
-    </div>
+
+</div>
+
+<div class="h-[260px]">
+<canvas id="chartPencairan"></canvas>
+</div>
+
+</div>
+
+
+<!-- Grafik Status WhatsApp -->
+<div class="bg-white rounded-2xl shadow-[0_10px_25px_rgba(0,0,0,0.05)] p-6">
+
+<div class="flex items-center justify-between mb-4">
+
+<h2 class="font-semibold text-slate-700">
+Status Notifikasi WhatsApp
+</h2>
+
+<div class="text-slate-400 text-xl cursor-pointer">
+⋯
+</div>
+
+</div>
+
+<div class="h-[260px] flex items-center justify-center">
+<canvas id="chartWA"></canvas>
+</div>
+
+</div>
 
 </div>
 
@@ -164,155 +231,214 @@
 
 {{-- ======================= PENCAIRAN TERBARU ======================= --}}
 
-<div class="bg-white rounded-xl shadow-sm">
+<div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
 
-    <div class="px-6 py-4 border-b">
+<div class="px-6 py-4 border-b border-slate-200">
+<h2 class="font-semibold text-slate-700">
+Pencairan Terbaru
+</h2>
+</div>
 
-        <h2 class="font-semibold text-slate-700">
-            Pencairan Terbaru
-        </h2>
+<table class="w-full text-sm">
 
-    </div>
+<thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+<tr class="text-left">
+<th class="px-6 py-3">Nama</th>
+<th class="px-6 py-3">Jenis Dana</th>
+<th class="px-6 py-3">Nominal</th>
+<th class="px-6 py-3">Tanggal</th>
+<th class="px-6 py-3">Status</th>
+</tr>
+</thead>
 
-    <table class="w-full text-sm">
+<tbody class="divide-y divide-slate-200">
 
-        <thead class="bg-slate-50 text-slate-500">
+@forelse($latest as $item)
 
-        <tr>
-            <th class="text-left px-6 py-3">Nama</th>
-            <th class="text-left px-6 py-3">Jenis Dana</th>
-            <th class="text-left px-6 py-3">Nominal</th>
-            <th class="text-left px-6 py-3">Tanggal</th>
-            <th class="text-left px-6 py-3">Status</th>
-        </tr>
+<tr class="hover:bg-slate-50 transition">
 
-        </thead>
+<td class="px-6 py-3">
+{{ $item->pegawai->nama ?? '-' }}
+</td>
 
-        <tbody>
+<td class="px-6 py-3 text-slate-600">
+{{ $item->jenis_dana }}
+</td>
 
-        @forelse($latest as $item)
+<td class="px-6 py-3 font-medium">
+Rp {{ number_format($item->nominal,0,',','.') }}
+</td>
 
-        <tr class="border-b hover:bg-slate-50">
+<td class="px-6 py-3 text-slate-600">
+{{ $item->created_at->format('d M Y') }}
+</td>
 
-            <td class="px-6 py-3">
-                {{ $item->pegawai->nama ?? '-' }}
-            </td>
+<td class="px-6 py-3">
+<span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600">
+berhasil
+</span>
+</td>
 
-            <td class="px-6 py-3">
-                {{ $item->jenis_dana }}
-            </td>
+</tr>
 
-            <td class="px-6 py-3">
-                Rp {{ number_format($item->nominal,0,',','.') }}
-            </td>
+@empty
 
-            <td class="px-6 py-3">
-                {{ $item->created_at->format('d M Y') }}
-            </td>
+<tr>
+<td colspan="5" class="text-center py-6 text-slate-400">
+Tidak ada data pencairan
+</td>
+</tr>
 
-            <td class="px-6 py-3">
+@endforelse
 
-                <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-600">
-                    berhasil
-                </span>
+</tbody>
 
-            </td>
-
-        </tr>
-
-        @empty
-
-        <tr>
-
-            <td colspan="5" class="text-center py-6 text-slate-400">
-                Tidak ada data pencairan
-            </td>
-
-        </tr>
-
-        @endforelse
-
-        </tbody>
-
-    </table>
+</table>
 
 </div>
 </div>
+
+</div>
+</div>
+
+<style>
+.filter-active{
+background:#01214d;
+color:white;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
+}
+
+.filter-active:hover{
+background:#0a2f63;
+}
+</style>
 
 <script>
 
+const dataBulanan = @json($totalPencairanBulanan);
+const labelBulanan = @json($bulan);
+
+const dataTahunan = @json($totalPencairanTahunan);
+const labelTahunan = @json($tahun);
+
 const ctxPencairan = document.getElementById('chartPencairan');
+
+let chart;
 
 if (ctxPencairan) {
 
-    new Chart(ctxPencairan, {
+const ctx = ctxPencairan.getContext('2d');
 
-        type: 'line',
+const gradient = ctx.createLinearGradient(0,0,0,250);
+gradient.addColorStop(0,'rgba(99,102,241,0.35)');
+gradient.addColorStop(1,'rgba(99,102,241,0)');
 
-        data: {
-            labels: @json($bulan),
+chart = new Chart(ctxPencairan, {
 
-            datasets: [{
-                label: 'Pencairan Dana',
+type:'line',
 
-                data: @json($totalPencairanBulanan),
+data:{
+labels:labelBulanan,
 
-                borderColor: '#6366f1',
-                backgroundColor: 'rgba(99,102,241,0.15)',
+datasets:[{
+label:'Pencairan Dana',
+data:dataBulanan,
+borderColor:'#6366f1',
+backgroundColor:gradient,
+borderWidth:3,
+tension:0.45,
+fill:true,
 
-                borderWidth: 2,
-                tension: 0.45,
-                fill: true,
+pointBackgroundColor:'#ffffff',
+pointBorderColor:'#6366f1',
+pointBorderWidth:3,
+pointRadius:5,
+pointHoverRadius:7
+}]
+},
 
-                pointBackgroundColor: '#6366f1',
-                pointBorderWidth: 0,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
+options:{
+responsive:true,
+maintainAspectRatio:false,
 
-        options: {
+interaction:{
+intersect:false,
+mode:'index'
+},
 
-            responsive: true,
-            maintainAspectRatio: false,
+plugins:{
+legend:{display:false},
 
-            plugins: {
+tooltip:{
+backgroundColor:'#111827',
+titleColor:'#fff',
+bodyColor:'#fff',
+padding:10,
+displayColors:false
+}
+},
 
-                legend: {
-                    display: false
-                }
+scales:{
+x:{
+grid:{display:false},
+ticks:{color:'#64748b',font:{size:11}}
+},
 
-            },
+y:{
+beginAtZero:true,
+grid:{color:'rgba(0,0,0,0.04)'},
+ticks:{
+color:'#64748b',
+font:{size:11},
+callback:function(value){
+return 'Rp '+value.toLocaleString('id-ID');
+}
+}
+}
+}
+}
 
-            scales: {
-
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-
-                y: {
-                    beginAtZero: true,
-
-                    grid: {
-                        color: 'rgba(0,0,0,0.05)'
-                    },
-
-                    ticks: {
-                        callback: function(value) {
-                            return 'Rp ' + value.toLocaleString('id-ID');
-                        }
-                    }
-                }
-
-            }
-
-        }
-
-    });
+});
 
 }
+
+function updateChart(type){
+
+document.querySelectorAll('.filter-btn')
+.forEach(btn=>btn.classList.remove('filter-active'));
+
+if(type==='bulan'){
+
+document.getElementById('btn-bulan').classList.add('filter-active');
+
+chart.data.labels=labelBulanan;
+chart.data.datasets[0].data=dataBulanan;
+
+}
+
+if(type==='tahun'){
+
+document.getElementById('btn-tahun').classList.add('filter-active');
+
+chart.data.labels=labelTahunan;
+chart.data.datasets[0].data=dataTahunan;
+
+}
+
+if(type==='semua'){
+
+document.getElementById('btn-semua').classList.add('filter-active');
+
+chart.data.labels=labelBulanan;
+chart.data.datasets[0].data=dataBulanan;
+
+}
+
+chart.update();
+
+}
+
+document.getElementById('btn-bulan').classList.add('filter-active');
 
 
 const ctxWA = document.getElementById('chartWA');

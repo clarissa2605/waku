@@ -95,33 +95,32 @@
                         </td>
 
                         <!-- Aksi (Bold & Professional) -->
-                        <td class="px-6 py-4 text-right">
-                            <div class="flex justify-end items-center gap-4">
+                        <td class="px-6 py-3 text-right flex gap-2 justify-end">
 
-                                <a href="{{ route('kelompok.show', $k->id_kelompok) }}"
-                                   class="font-semibold text-slate-700 hover:text-blue-600 transition">
-                                    Detail
-                                </a>
+<a href="{{ route('kelompok.show', $k->id_kelompok) }}"
+class="px-3 py-1 text-xs rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+Detail
+</a>
 
-                                <a href="{{ route('kelompok.edit', $k->id_kelompok) }}"
-                                   class="font-semibold text-blue-600 hover:text-blue-800 transition">
-                                    Edit
-                                </a>
+<a href="{{ route('kelompok.edit', $k->id_kelompok) }}"
+class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition">
+Edit
+</a>
 
-                                <form action="{{ route('kelompok.destroy', $k->id_kelompok) }}"
-                                      method="POST"
-                                      onsubmit="return confirm('Yakin ingin menghapus kelompok ini?')">
-                                    @csrf
-                                    @method('DELETE')
+<form action="{{ route('kelompok.destroy', $k->id_kelompok) }}" method="POST"
+onsubmit="return confirm('Yakin ingin menghapus kelompok ini?')">
 
-                                    <button type="submit"
-                                            class="font-semibold text-red-600 hover:text-red-800 transition">
-                                        Hapus
-                                    </button>
-                                </form>
+@csrf
+@method('DELETE')
 
-                            </div>
-                        </td>
+<button type="submit"
+class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition">
+Hapus
+</button>
+
+</form>
+
+</td>
 
                     </tr>
 

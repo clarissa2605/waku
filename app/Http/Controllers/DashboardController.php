@@ -52,17 +52,41 @@ class DashboardController extends Controller
             $totalPencairanBulanan[] = $item->total;
 
 }
-        return view('admin.dashboard', compact(
-            'totalPegawai',
-            'totalMitra',
-            'totalKelompok',
-            'totalPencairan',
-            'waSuccess',
-            'waError',
-            'waPending',
-            'latest',
-            'bulan',
-            'totalPencairanBulanan'
-        ));
-            }
+// ================= GRAFIK PENCAIRAN PER TAHUN =================
+
+$grafikTahunan = PencairanDana::select(
+    DB::raw('YEAR(created_at) as tahun'),
+    DB::raw('SUM(nominal) as total')
+)
+->groupBy('tahun')
+->orderBy('tahun')
+->get();
+
+$tahun = [];
+$totalPencairanTahunan = [];
+
+foreach ($grafikTahunan as $item) {
+
+    $tahun[] = $item->tahun;
+    $totalPencairanTahunan[] = $item->total;
+
+}
+
+       return view('admin.dashboard', compact(
+    'totalPegawai',
+    'totalMitra',
+    'totalKelompok',
+    'totalPencairan',
+    'waSuccess',
+    'waError',
+    'waPending',
+    'latest',
+    'bulan',
+    'totalPencairanBulanan',
+    'tahun',
+    'totalPencairanTahunan'
+));
+}
+
+            
 }

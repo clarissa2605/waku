@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="max-w-5xl mx-auto">
+<div class="max-w-5xl mx-auto profile-password-page">
 
     <!-- Header -->
     <div class="mb-6">
@@ -93,70 +93,125 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <!-- Password Baru -->
-<div>
-    <label class="block text-sm font-medium text-slate-800 mb-2">
-        Password Baru
-    </label>
+                <div>
 
-    <div class="relative">
+                    <label class="block text-sm font-medium text-slate-800 mb-2">
+                        Password Baru
+                    </label>
 
-        <input type="password"
-               id="password"
-               name="password"
-               required
-               class="w-full border border-slate-200 rounded-lg px-4 py-2 pr-10 text-sm
-                      focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                    <div class="relative">
 
-        <!-- Toggle Password -->
-        <button type="button"
-                id="togglePassword"
-                class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
-        </button>
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               required
+                               class="w-full border border-slate-200 rounded-lg px-4 py-2 pr-12 text-sm
+                                      focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
 
-    </div>
+                        <button type="button"
+                                id="togglePassword"
+                                class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600">
 
-    <!-- Password Strength -->
-    <div class="mt-2">
-        <div class="w-full h-2 bg-slate-200 rounded">
-            <div id="passwordStrengthBar"
-                class="h-2 rounded bg-red-500"
-                style="width:0%"></div>
-        </div>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
 
-        <p id="passwordStrengthText"
-           class="text-xs mt-1 text-slate-500">
-            Password strength
-        </p>
-    </div>
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
 
-    <p class="text-xs text-slate-500 mt-1">
-        Minimal 8 karakter, termasuk huruf besar, huruf kecil, angka, dan simbol.
-    </p>
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5
+                                         c4.477 0 8.268 2.943 9.542 7
+                                         -1.274 4.057-5.065 7-9.542 7
+                                         -4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
 
-    @error('password')
-        <p class="text-sm text-red-500 mt-1">
-            {{ $message }}
-        </p>
-    @enderror
-</div>
+                        </button>
+
+                    </div>
+
+
+                    <!-- Password Strength -->
+                    <div class="mt-2">
+                        <div class="w-full h-2 bg-slate-200 rounded">
+                            <div id="passwordStrengthBar"
+                                class="h-2 rounded bg-red-500"
+                                style="width:0%"></div>
+                        </div>
+
+                        <p id="passwordStrengthText"
+                           class="text-xs mt-1 text-slate-500">
+                            Password strength
+                        </p>
+                    </div>
+
+                    <p class="text-xs text-slate-500 mt-1">
+                        Minimal 8 karakter, termasuk huruf besar, huruf kecil, angka, dan simbol.
+                    </p>
+
+                    @error('password')
+                        <p class="text-sm text-red-500 mt-1">
+                            {{ $message }}
+                        </p>
+                    @enderror
+
+                </div>
 
 
                 <!-- Konfirmasi Password -->
                 <div>
+
                     <label class="block text-sm font-medium text-slate-800 mb-2">
                         Konfirmasi Password
                     </label>
 
-                    <input type="password"
-                     id="confirmPassword"
-                    name="password_confirmation"
-                    required
-                    class="w-full border border-slate-200 rounded-lg px-4 py-2 text-sm
-              focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+                    <div class="relative">
 
-<p id="passwordMatchText"
-   class="text-xs mt-1 text-slate-500">
-</p>
+                        <input type="password"
+                               id="confirmPassword"
+                               name="password_confirmation"
+                               required
+                               class="w-full border border-slate-200 rounded-lg px-4 py-2 pr-12 text-sm
+                                      focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none">
+
+                        <button type="button"
+                                id="toggleConfirmPassword"
+                                class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600">
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-5 w-5"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5
+                                         c4.477 0 8.268 2.943 9.542 7
+                                         -1.274 4.057-5.065 7-9.542 7
+                                         -4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <p id="passwordMatchText"
+                       class="text-xs mt-1 text-slate-500">
+                    </p>
+
                 </div>
 
             </div>
@@ -181,7 +236,22 @@
 
 @endsection
 
-@section('scripts')
+<style>
+
+/* hide browser password eye ONLY on profile page */
+
+.profile-password-page input[type="password"]::-ms-reveal,
+.profile-password-page input[type="password"]::-ms-clear {
+    display: none;
+}
+
+.profile-password-page input[type="password"]::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+}
+
+</style>
+
 @section('scripts')
 
 <script>
@@ -193,7 +263,11 @@ const confirmInput = document.getElementById('confirmPassword');
 const bar = document.getElementById('passwordStrengthBar');
 const text = document.getElementById('passwordStrengthText');
 const matchText = document.getElementById('passwordMatchText');
-const toggle = document.getElementById('togglePassword');
+
+const togglePassword = document.getElementById('togglePassword');
+const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+
+if(!passwordInput) return;
 
 
 /* =========================
@@ -243,13 +317,25 @@ passwordInput.addEventListener('input', function(){
 
 
 /* =========================
-SHOW / HIDE PASSWORD
+TOGGLE PASSWORD
 ========================= */
 
-toggle.addEventListener('click', function(){
+togglePassword.addEventListener('click', function(){
 
     const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
     passwordInput.setAttribute('type', type);
+
+});
+
+
+/* =========================
+TOGGLE CONFIRM PASSWORD
+========================= */
+
+toggleConfirmPassword.addEventListener('click', function(){
+
+    const type = confirmInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    confirmInput.setAttribute('type', type);
 
 });
 

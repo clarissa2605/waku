@@ -9,7 +9,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body class="bg-slate-50 text-slate-800 h-screen overflow-hidden">
+<body class="text-slate-800 h-screen overflow-hidden">
+
+
+<!-- Background Batik -->
+<div style="
+position: fixed;
+inset: 0;
+z-index: -1;
+background-image: url('/images/batik-bg.png');
+background-repeat: repeat;
+background-size: 700px;
+opacity: 15;
+"></div>
 
 <div class="flex h-screen">
 
@@ -42,6 +54,9 @@
     </main>
 
 </div>
+
+{{-- Scripts dari halaman --}}
+@yield('scripts')
 
 </body>
 </html>

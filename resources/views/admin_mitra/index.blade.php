@@ -140,16 +140,16 @@
                     </td>
 
                     {{-- AKSI --}}
-                    <td class="py-3 text-center space-x-4">
+                    <td class="py-3 flex justify-center gap-2">
 
                         <a href="{{ route('mitra.show', $item->id_mitra) }}"
-                           class="text-slate-600 hover:text-blue-600 text-sm font-medium">
-                            Detail
+                        class="px-3 py-1 text-xs rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+                        Detail
                         </a>
 
                         <a href="{{ route('mitra.edit', $item->id_mitra) }}"
-                           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                            Edit
+                           class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition">
+                        Edit
                         </a>
 
                     </td>
