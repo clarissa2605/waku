@@ -195,6 +195,15 @@
                             @endif
                         </form>
 
+                        {{-- MENU 3 TITIK --}}
+                        <a href="{{ route('pegawai.detail',$p->id_pegawai) }}" class="p-1 rounded hover:bg-slate-100">
+
+                        <x-heroicon-o-ellipsis-horizontal class="w-5 h-5 text-slate-500"/>
+
+                        </a>
+
+                        </div>
+
                     </td>
 
                 </tr>

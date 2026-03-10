@@ -12,6 +12,7 @@ use App\Http\Controllers\MitraController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LogAktivitasController;
+use App\Http\Controllers\ViewerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -206,6 +207,9 @@ Route::prefix('admin')
 
         Route::patch('pegawai/reset-password/{user}', [PegawaiController::class, 'resetPassword'])
             ->name('pegawai.reset.password');
+        
+        Route::get('pegawai/{id}/detail', [PegawaiController::class, 'detailPegawai'])
+            ->name('pegawai.detail');
 
 });
     
@@ -228,9 +232,20 @@ Route::get('/admin/mitra/{id}/kelompok', function ($id) {
 | PEGAWAI DASHBOARD
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth'])->group(function () {
 
-Route::get('/pegawai/dashboard', [PencairanDanaController::class, 'dashboardPegawai'])
-    ->name('pegawai.dashboard');
+    Route::get('/pegawai/dashboard', [PegawaiController::class, 'dashboard'])
+        ->name('pegawai.dashboard');
+
+    Route::get('/pegawai/profile', [PegawaiController::class, 'profile'])
+        ->name('pegawai.profile');
+
+    Route::get('/pegawai/pencairan/{id}', [PegawaiController::class, 'detail'])
+        ->name('pegawai.pencairan.detail');
+    
+
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -243,9 +258,9 @@ Route::prefix('viewer')
     ->group(function () {
 
         Route::get('/dashboard',
-            [PencairanDanaController::class, 'dashboardViewer']
+            [ViewerController::class, 'dashboard']
         )->name('viewer.dashboard');
-    });
+});
 
 /*
 |--------------------------------------------------------------------------

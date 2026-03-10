@@ -11,6 +11,10 @@ use Illuminate\View\View;
 use App\Http\Controllers\Controller;
 use App\Helpers\LogHelper;
 use Illuminate\Support\Str; 
+use Illuminate\Support\Facades\Auth;
+use App\Models\PencairanDana;
+
+
 class PegawaiController extends Controller
 {
     /* =====================================================
@@ -220,4 +224,55 @@ class PegawaiController extends Controller
         'Password berhasil direset. Password baru: '.$newPassword
     );
 }
+
+
+   public function dashboard()
+{
+    $pegawaiId = Auth::user()->pegawai_id;
+
+    $riwayat = PencairanDana::where('pegawai_id', $pegawaiId)
+                ->orderBy('tanggal','desc')
+                ->get();
+
+    $totalNominal = $riwayat->sum('nominal');
+    $totalPotongan = $riwayat->sum('potongan');
+    $totalBersih = $riwayat->sum('nominal_bersih');
+
+    return view('pegawai.dashboard', compact(
+        'riwayat',
+        'totalNominal',
+        'totalPotongan',
+        'totalBersih'
+    ));
+}
+
+
+    public function detail($id)
+{
+    $pegawaiId = Auth::user()->pegawai_id;
+
+    $data = PencairanDana::where('id_pencairan', $id)
+            ->where('pegawai_id', $pegawaiId)
+            ->firstOrFail();
+
+    return view('pegawai.detail', compact('data'));
+}
+
+
+    public function profile()
+{
+    $user = Auth::user();
+
+    $pegawai = Pegawai::where('id_pegawai', $user->pegawai_id)->first();
+
+    return view('pegawai.profile', compact('pegawai','user'));
+}
+
+public function detailPegawai($id)
+{
+    $pegawai = Pegawai::with('user')->findOrFail($id);
+
+    return view('admin_pegawai.detail', compact('pegawai'));
+}
+
 }

@@ -1,12 +1,27 @@
-<aside class="w-72 bg-[#01214d] border-r border-[#1e3a5f] flex flex-col h-screen overflow-y-auto overflow-x-hidden text-white">
+<aside class="w-64 bg-[#01214d] border-r border-[#1e3a5f] fixed inset-y-0 left-0 overflow-y-auto overflow-x-hidden text-white no-scrollbar">
 
-    <!-- Logo -->
-    <div class="px-6 py-6 border-b border-[#1e3a5f]">
-        <img src="{{ asset('images/logo-app.png') }}" class="h-10">
-        <p class="text-xs text-blue-200 mt-2">
-            Web Aktif Komunikasi Keuangan
-        </p>
+<div class="px-6 py-6 border-b border-[#1e3a5f]">
+
+    <div class="flex items-center gap-3">
+
+        <!-- Icon WAKU -->
+        <img src="{{ asset('images/logo-app1.png') }}" 
+             class="h-12">
+
+        <!-- Text -->
+        <div>
+            <h1 class="text-white text-xl font-semibold tracking-wide leading-none">
+                WAKU
+            </h1>
+
+            <p class="text-xs text-blue-200 mt-1 tracking-wide opacity-80">
+                BPS SULAWESI UTARA
+            </p>
+        </div>
+
     </div>
+
+</div>
 
     <!-- User Info -->
     <div class="px-6 py-6 border-b border-[#1e3a5f]">
@@ -27,16 +42,13 @@
 
     <!-- Navigation -->
     <nav class="flex-1 px-3 py-6 text-sm">
-    <div class="space-y-2 max-w-[240px] mx-auto">
+    <div class="space-y-2">
 
 
         {{-- DASHBOARD --}}
         <a href="{{ route('admin.dashboard') }}"
-        class="flex items-center mx-2 px-4 py-3 rounded-xl
-        transition-all duration-200 ease-out
-        {{ request()->routeIs('admin.dashboard')
-        ? 'bg-[#0a2f63] text-white font-medium'
-        : 'text-blue-100 hover:bg-[#0a2f63]/60' }}">
+        class="flex items-center px-4 py-3 rounded-xl transition
+        {{ request()->routeIs('admin.dashboard') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
 
         <x-heroicon-o-home class="w-5 h-5 mr-3"/>
         Dashboard
@@ -51,8 +63,8 @@
         <div x-data="{ open: {{ request()->routeIs('pegawai.*') ? 'true' : 'false' }} }">
 
             <button @click="open = !open"
-                class="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-lg transition
-                hover:bg-[#0a2f63] text-blue-100">
+                class="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl transition all duration-200 ease-out
+                hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100">
 
                 <div class="flex items-center">
                     <x-heroicon-o-user class="w-5 h-5 mr-3" />
@@ -87,8 +99,8 @@
         <div x-data="{ open: {{ request()->routeIs('mitra.*') ? 'true' : 'false' }} }">
 
             <button @click="open = !open"
-                class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition
-                hover:bg-[#0a2f63] text-blue-100">
+                class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ease-out
+                hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100">
 
                 <div class="flex items-center">
                     <x-heroicon-o-user-group class="w-5 h-5 mr-3" />
@@ -121,8 +133,8 @@
 
         {{-- Kelompok Mitra --}}
         <a href="{{ route('kelompok.index') }}"
-        class="flex items-center px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('kelompok.*') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63] text-blue-100' }}">
+        class="flex items-center px-4 py-3 rounded-xl transition
+        {{ request()->routeIs('kelompok.*') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
             <x-heroicon-o-users class="w-5 h-5 mr-3" />
             Kelompok Mitra
         </a>
@@ -136,8 +148,8 @@
         <div x-data="{ open: {{ request()->routeIs('pencairan.create') || request()->routeIs('pencairan.mitra.create') ? 'true' : 'false' }} }">
 
             <button @click="open = !open"
-            class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition
-            hover:bg-[#0a2f63] text-blue-100">
+            class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition
+            hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100">
 
             <div class="flex items-center">
             <x-heroicon-o-banknotes class="w-5 h-5 mr-3" />
@@ -171,8 +183,8 @@
         <div x-data="{ open: {{ request()->routeIs('pencairan.import.*') ? 'true' : 'false' }} }">
 
             <button @click="open = !open"
-            class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition
-            hover:bg-[#0a2f63] text-blue-100">
+            class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ease-out
+            hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100">
 
             <div class="flex items-center">
             <x-heroicon-o-document-arrow-up class="w-5 h-5 mr-3" />
@@ -198,8 +210,8 @@
 
     
         <a href="{{ route('pencairan.index') }}"
-        class="flex items-center px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('pencairan.index') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63] text-blue-100' }}">
+        class="flex items-center px-4 py-3 rounded-xl transition
+        {{ request()->routeIs('pencairan.index') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
 
             <x-heroicon-o-clock class="w-5 h-5 mr-3" />
             Riwayat Pencairan
@@ -212,8 +224,8 @@
         </p>
 
         <a href="{{ route('log.notifikasi') }}"
-        class="flex items-center px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('log.notifikasi') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63] text-blue-100' }}">
+        class="flex items-center px-4 py-3 rounded-xl transition
+        {{ request()->routeIs('log.notifikasi') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
 
         <x-heroicon-o-bell class="w-5 h-5 mr-3" />
         Log Notifikasi WA
@@ -221,8 +233,8 @@
         </a>
 
         <a href="{{ route('template.index') }}"
-        class="flex items-center px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('template.*') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63] text-blue-100' }}">
+        class="flex items-center px-4 py-3 rounded-xl transition
+        {{ request()->routeIs('template.*') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
 
         <x-heroicon-o-chat-bubble-left-right class="w-5 h-5 mr-3" />
         Template Pesan WA
@@ -235,8 +247,8 @@
         </p>
 
         <a href="{{ route('laporan.index') }}"
-        class="flex items-center px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('laporan.*') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63] text-blue-100' }}">
+        class="flex items-center px-4 py-3 rounded-xl transition
+        {{ request()->routeIs('laporan.*') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
 
         <x-heroicon-o-chart-bar class="w-5 h-5 mr-3" />
         Laporan
@@ -249,8 +261,8 @@
         </p>
 
         <a href="{{ route('log.aktivitas') }}"
-        class="flex items-center px-4 py-3 rounded-lg transition
-        {{ request()->routeIs('log.aktivitas') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63] text-blue-100' }}">
+        class="flex items-center px-4 py-3 rounded-xl transition
+        {{ request()->routeIs('log.aktivitas') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
 
         <x-heroicon-o-document-text class="w-5 h-5 mr-3" />
         Log Aktivitas
@@ -258,8 +270,8 @@
         </a>
 
         <a href="{{ route('profile.edit') }}"
-           class="flex items-center px-4 py-3 rounded-lg transition
-           {{ request()->routeIs('profile.edit') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63] text-blue-100' }}">
+           class="flex items-center px-4 py-3 rounded-xl transition
+           {{ request()->routeIs('profile.edit') ? 'bg-[#0a2f63] text-white font-medium' : 'hover:bg-[#0a2f63]/60 hover:translate-x-[2px] text-blue-100' }}">
             <x-heroicon-o-user-circle class="w-5 h-5 mr-3" />
             Profil Saya
         </a>
