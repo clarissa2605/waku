@@ -3,7 +3,7 @@
 <!-- LOGO -->
 <div class="px-6 py-6 border-b border-[#1e3a5f]">
     <div class="flex items-center gap-3">
-        <img src="{{ asset('images/logo-waku.png') }}" class="h-10">
+        <img src="{{ asset('images/logo-app1.png') }}" class="h-10">
         <div>
             <p class="font-semibold text-lg">WAKU</p>
             <p class="text-xs text-blue-200">BPS Sulawesi Utara</p>

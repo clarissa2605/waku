@@ -78,9 +78,25 @@ class ViewerController extends Controller
 
 
         // Top 10 Pencairan
-        $topPencairan = PencairanDana::orderByDesc('nominal_bersih')
-                        ->limit(10)
-                        ->get();
+$pegawai = PencairanDana::join('pegawai','pencairan_dana.pegawai_id','=','pegawai.id_pegawai')
+    ->select(
+        'pegawai.nama',
+        'pencairan_dana.jenis_dana',
+        'pencairan_dana.nominal_bersih'
+    );
+
+$mitra = PencairanDanaMitra::join('mitra','pencairan_dana_mitra.mitra_id','=','mitra.id_mitra')
+    ->select(
+        'mitra.nama_mitra as nama',
+        'pencairan_dana_mitra.jenis_dana',
+        'pencairan_dana_mitra.nominal_bersih'
+    );
+
+$topPencairan = $pegawai
+    ->unionAll($mitra)
+    ->orderByDesc('nominal_bersih')
+    ->limit(10)
+    ->get();
         
         $perUnit = PencairanDana::join('pegawai', 'pencairan_dana.pegawai_id', '=', 'pegawai.id_pegawai')
             ->selectRaw("
