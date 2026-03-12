@@ -51,10 +51,10 @@
                            focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <option value="">Semua Kelompok</option>
                 @foreach($kelompokList as $kelompok)
-                    <option value="{{ $kelompok->id }}"
-                        {{ request('kelompok') == $kelompok->id ? 'selected' : '' }}>
-                        {{ $kelompok->nama_kelompok }}
-                    </option>
+                <option value="{{ $kelompok->id_kelompok }}"
+                {{ request('kelompok') == $kelompok->id_kelompok ? 'selected' : '' }}>
+                {{ $kelompok->nama_kelompok }}
+                </option>
                 @endforeach
             </select>
         </div>

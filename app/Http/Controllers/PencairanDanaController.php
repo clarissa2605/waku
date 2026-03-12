@@ -364,6 +364,30 @@ public function importConfirm(Request $request)
      * ========================================================= */
 public function kirimWA($id)
 {
+       // 🔹 TAMBAHAN: cek apakah data milik mitra
+    $pencairanMitra = PencairanDanaMitra::find($id);
+
+    if ($pencairanMitra) {
+
+        if (in_array($pencairanMitra->status_notifikasi, ['belum', 'gagal'])) {
+
+            $pencairanMitra->update([
+                'status_notifikasi' => 'diproses'
+            ]);
+
+            KirimWhatsAppJob::dispatch($pencairanMitra->id_pencairan);
+
+            LogHelper::simpan(
+                'Kirim Notifikasi WA',
+                'Notifikasi',
+                'Notifikasi pencairan mitra dikirim'
+            );
+
+            return back()->with('success', 'Pesan dimasukkan ke antrian.');
+        }
+
+        return back()->with('error', 'Pesan tidak bisa dikirim ulang.');
+    }
     $pencairan = PencairanDana::findOrFail($id);
 
     if (in_array($pencairan->status_notifikasi, ['belum', 'gagal'])) {
@@ -425,14 +449,14 @@ public function bulkSend(Request $request)
 
     if ($mode === 'mitra') {
 
-        $items = PencairanDanaMitra::whereIn('id_pencairan_mitra', $ids)
-            ->whereIn('status_notifikasi', ['belum', 'gagal'])
-            ->get();
+    $items = PencairanDanaMitra::whereIn('id_pencairan', $ids)
+        ->whereIn('status_notifikasi', ['belum', 'gagal'])
+        ->get();
 
-        foreach ($items as $item) {
-            $item->update(['status_notifikasi' => 'antrian']);
-            KirimWhatsAppJob::dispatch($item->id_pencairan_mitra);
-        }
+    foreach ($items as $item) {
+        $item->update(['status_notifikasi' => 'diproses']);
+        KirimWhatsAppJob::dispatch($item->id_pencairan);
+    }
 
     } else {
 
@@ -441,7 +465,7 @@ public function bulkSend(Request $request)
             ->get();
 
         foreach ($items as $item) {
-            $item->update(['status_notifikasi' => 'antrian']);
+            $item->update(['status_notifikasi' => 'diproses']);
             KirimWhatsAppJob::dispatch($item->id_pencairan);
         }
     }

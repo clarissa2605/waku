@@ -258,7 +258,13 @@ Pencairan Terbaru
 <tr class="hover:bg-slate-50 transition">
 
 <td class="px-6 py-3">
-{{ $item->pegawai->nama ?? '-' }}
+
+{{ $item->pegawai->nama ?? $item->mitra->nama_mitra ?? '-' }}
+
+@if(isset($item->mitra))
+<span class="text-xs text-orange-500 ml-1">(Mitra)</span>
+@endif
+
 </td>
 
 <td class="px-6 py-3 text-slate-600">

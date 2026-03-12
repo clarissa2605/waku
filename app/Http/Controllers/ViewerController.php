@@ -6,6 +6,10 @@ use App\Models\PencairanDana;
 use App\Models\Pegawai;
 use App\Models\Mitra;
 use App\Models\PencairanDanaMitra;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 
 
@@ -124,4 +128,24 @@ $topPencairan = $pegawai
     'distribusiDana'
 ));
     }
+
+    public function profile()
+{
+    return view('viewer.profile');
+}
+
+public function updatePassword(Request $request)
+{
+    $request->validate([
+        'password' => 'required|min:8|confirmed'
+    ]);
+
+    /** @var User $user */
+    $user = Auth::user();
+
+    $user->password = Hash::make($request->password);
+    $user->save();
+
+    return back()->with('success','Password berhasil diperbarui');
+}
 }

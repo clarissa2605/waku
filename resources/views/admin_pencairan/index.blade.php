@@ -139,9 +139,7 @@
                                 @if(in_array($p->status_notifikasi, ['belum','gagal']))
                                     <input type="checkbox"
                                            name="selected[]"
-                                           value="{{ request('mode') === 'mitra' 
-                                                ? $p->id_pencairan_mitra 
-                                                : $p->id_pencairan }}"
+                                           value="{{ $p->id_pencairan }}"
                                            class="rowCheckbox w-4 h-4 text-blue-600 border-slate-300 rounded">
                                 @endif
                             </td>
@@ -200,9 +198,7 @@
                                 @if(in_array($p->status_notifikasi, ['belum','gagal']))
 
                                     @php
-                                        $idRoute = request('mode') === 'mitra'
-                                            ? ($p->id_pencairan_mitra ?? null)
-                                            : ($p->id_pencairan ?? null);
+                                        $idRoute = $p->id_pencairan ?? null;
                                     @endphp
 
                                     @if($idRoute)

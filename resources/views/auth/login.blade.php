@@ -58,7 +58,7 @@ SUPPORTED BY
 </div>
 
 <p class="text-blue-100 text-sm mt-2">
-Badan Pusat Statistik Sulawesi Utara
+Tim Keuangan Badan Pusat Statistik Sulawesi Utara
 </p>
 
 </div>

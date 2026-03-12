@@ -254,12 +254,18 @@ Route::middleware(['auth'])->group(function () {
 */
 
 Route::prefix('viewer')
-    ->middleware(['auth', 'role:viewer'])
+    ->middleware(['auth','role:viewer'])
     ->group(function () {
 
-        Route::get('/dashboard',
-            [ViewerController::class, 'dashboard']
-        )->name('viewer.dashboard');
+        Route::get('/dashboard', [ViewerController::class, 'dashboard'])
+            ->name('viewer.dashboard');
+
+        Route::get('/profile', [ViewerController::class, 'profile'])
+            ->name('viewer.profile');
+
+        Route::post('/profile/password', [ViewerController::class, 'updatePassword'])
+            ->name('viewer.password');
+
 });
 
 /*

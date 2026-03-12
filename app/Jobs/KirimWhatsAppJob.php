@@ -11,14 +11,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use App\Models\LogPencairan;
+use App\Models\PencairanDanaMitra;
 
 class KirimWhatsAppJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $pencairanId;
-
-    public $tries = 3;
 
     public function __construct($pencairanId)
     {
@@ -29,10 +28,10 @@ class KirimWhatsAppJob implements ShouldQueue
     public function handle(WhatsAppService $waService): void
     {
         // ==============================
-        // 🔒 LIMIT 100 PESAN PER JAM
+        // 🔒 LIMIT 300 PESAN PER JAM
         // ==============================
         $limitKey = 'wa_hourly_limit_' . now()->format('YmdH');
-        $maxPerHour = 100;
+        $maxPerHour = 300;
 
         $count = Cache::get($limitKey, 0);
 
@@ -48,37 +47,60 @@ class KirimWhatsAppJob implements ShouldQueue
         // ==============================
         // Ambil data pencairan
         // ==============================
+
         $pencairan = PencairanDana::with('pegawai')
             ->find($this->pencairanId);
 
+        $mode = 'pegawai';
+
         if (!$pencairan) {
-            return;
+
+            $pencairan = PencairanDanaMitra::with('mitra')
+                ->find($this->pencairanId);
+
+            $mode = 'mitra';
         }
+
+                if (!$pencairan) {
+                    return;
+                }
+
+                if ($pencairan->status_notifikasi === 'terkirim') {
+                    return;
+                }
 
         // ubah status jadi diproses
         $pencairan->update([
             'status_notifikasi' => 'diproses'
         ]);
+        // ==============================
+        // Tentukan penerima
+        // ==============================
+        if ($mode === 'pegawai') {
 
-        if (!$pencairan || !$pencairan->pegawai) {
-            return;
+            $penerima = $pencairan->pegawai;
+
+        } else {
+
+            $penerima = $pencairan->mitra;
+
         }
 
-        $pegawai = $pencairan->pegawai;
+if (!$penerima || !$penerima->no_whatsapp) {
 
-        if (!$pegawai->no_whatsapp) {
-            $pencairan->update([
-                'status_notifikasi' => 'gagal'
-            ]);
-            return;
-        }
+    $pencairan->update([
+        'status_notifikasi' => 'gagal'
+    ]);
+
+    return;
+}
 
 // ==============================
 // Siapkan parameter template
 // ==============================
 
 $params = [
-    $pegawai->nama,                                // {{1}}
+    $mode === 'pegawai' ? $penerima->nama : $penerima->nama_mitra,                              // {{1}}
     $pencairan->jenis_dana,                        // {{2}}
     $pencairan->nama_bank,                         // {{3}}
     $pencairan->nama_rekening,                     // {{4}}
@@ -90,11 +112,31 @@ $params = [
 ];
 
 // Kirim template ke MeeChat
-$kirim = $waService->sendTemplate(
-    $pegawai,
-    '499_client_wakuforwa_notifikasi_fix',
-    $params
-);
+try {
+
+    $kirim = $waService->sendTemplate(
+        $penerima,
+        '499_client_wakuforwa_notifikasi_fix',
+        $params
+    );
+
+} catch (\Exception $e) {
+
+    // jika API error
+    $pencairan->update([
+        'status_notifikasi' => 'gagal'
+    ]);
+
+    LogPencairan::create([
+        'id_pencairan' => $pencairan->id_pencairan,
+        'pegawai_id'   => $mode === 'pegawai' ? $pencairan->pegawai_id : null,
+        'mitra_id'     => $mode === 'mitra' ? $pencairan->mitra_id : null,
+        'aksi'         => 'gagal',
+        'deskripsi'    => 'Error kirim WhatsApp: ' . $e->getMessage(),
+    ]);
+
+    return;
+}
         if ($kirim['status'] === 'success') {
 
             $pencairan->update([
@@ -102,11 +144,12 @@ $kirim = $waService->sendTemplate(
             ]);
 
             LogPencairan::create([
-                'id_pencairan' => $pencairan->id_pencairan,
-                'pegawai_id'   => $pencairan->pegawai_id,
-                'aksi'         => 'terkirim',
-                'deskripsi'    => 'Notifikasi WhatsApp berhasil dikirim',
-            ]);
+            'id_pencairan' => $pencairan->id_pencairan,
+            'pegawai_id'   => $mode === 'pegawai' ? $pencairan->pegawai_id : null,
+            'mitra_id'     => $mode === 'mitra' ? $pencairan->mitra_id : null,
+            'aksi'         => 'terkirim',
+            'deskripsi'    => 'Notifikasi WhatsApp berhasil dikirim',
+        ]);
 
         } else {
 
@@ -115,11 +158,12 @@ $kirim = $waService->sendTemplate(
             ]);
 
             LogPencairan::create([
-                'id_pencairan' => $pencairan->id_pencairan,
-                'pegawai_id'   => $pencairan->pegawai_id,
-                'aksi'         => 'gagal',
-                'deskripsi'    => 'Notifikasi WhatsApp gagal dikirim',
-            ]);
+            'id_pencairan' => $pencairan->id_pencairan,
+            'pegawai_id'   => $mode === 'pegawai' ? $pencairan->pegawai_id : null,
+            'mitra_id'     => $mode === 'mitra' ? $pencairan->mitra_id : null,
+            'aksi'         => 'gagal',
+            'deskripsi'    => 'Notifikasi WhatsApp gagal dikirim',
+        ]);
         }
     }
 }
