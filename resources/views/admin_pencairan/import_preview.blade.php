@@ -33,6 +33,7 @@
                                 {{ $mode === 'pegawai' ? 'NIP' : 'NIK' }}
                             </th>
                             <th class="px-6 py-4 font-medium">Nama</th>
+                            <th class="px-6 py-4 font-medium">Kelompok</th>
                             <th class="px-6 py-4 font-medium">Tanggal</th>
                             <th class="px-6 py-4 font-medium">Jenis Dana</th>
                             <th class="px-6 py-4 font-medium">Bank</th>
@@ -61,6 +62,12 @@
 
                             <td class="px-6 py-4 text-slate-700">
                                 {{ $row['nama'] }}
+                            </td>
+
+                            <td>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                                    {{ $row['kelompok_nama'] }}
+                                </span>
                             </td>
 
                             <td class="px-6 py-4 text-slate-600">
@@ -115,6 +122,7 @@
                         <input type="hidden" name="data[{{ $i }}][jenis_dana]" value="{{ $row['jenis_dana'] }}">
                         <input type="hidden" name="data[{{ $i }}][nominal]" value="{{ $row['nominal'] }}">
                         <input type="hidden" name="data[{{ $i }}][potongan]" value="{{ $row['potongan'] }}">
+                        <input type="hidden" name="data[{{ $i }}][kelompok_id]" value="{{ $row['kelompok_id'] ?? '' }}">
                         <input type="hidden" name="data[{{ $i }}][nama_bank]" value="{{ $row['nama_bank'] }}">
                         <input type="hidden" name="data[{{ $i }}][nama_rekening]" value="{{ $row['nama_rekening'] }}">
                         <input type="hidden" name="data[{{ $i }}][no_rekening]" value="{{ $row['no_rekening'] }}">

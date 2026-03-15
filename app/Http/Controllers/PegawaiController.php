@@ -99,10 +99,13 @@ class PegawaiController extends Controller
         $pegawai = Pegawai::findOrFail($id);
 
         $validated = $request->validate([
-            'nama'       => 'required|string|max:255',
-            'unit_kerja' => 'required|string|max:255',
-            'status'     => 'required|in:aktif,nonaktif',
-        ]);
+        'nama'        => 'required|string|max:255',
+        'unit_kerja'  => 'required|string|max:255',
+        'no_whatsapp' => ['required','regex:/^62[0-9]{8,13}$/'],
+        'status'      => 'required|in:aktif,nonaktif',
+    ],[
+        'no_whatsapp.regex' => 'Nomor WhatsApp harus diawali 62 dan tanpa spasi. Contoh: 628123456789',
+    ]);
 
         $pegawai->update($validated);
 

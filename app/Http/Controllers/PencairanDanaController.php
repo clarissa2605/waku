@@ -202,6 +202,7 @@ public function importPreview(Request $request)
 
         $valid = false;
         $nama  = '';
+        $namaKelompok = '-';
 
         if ($mode === 'pegawai') {
 
@@ -215,21 +216,41 @@ public function importPreview(Request $request)
         } else {
 
             $kelompok_id = $data['kelompok_id'] ?? null;
+$namaKelompok = '-';
+
+if ($kelompok_id) {
+
+    $kelompok = \App\Models\KelompokMitra::where('id_kelompok', $kelompok_id)->first();
+
+    if ($kelompok) {
+        $namaKelompok = $kelompok->nama_kelompok;
+    } else {
+        $namaKelompok = '❌ Kelompok tidak ditemukan';
+    }
+}
 
             $mitra = \App\Models\Mitra::where('nik', $identifier)
                 ->where('status', 'aktif')
                 ->first();
 
-            if ($mitra && $kelompok_id) {
-                $validKelompok = $mitra->kelompok()
-                    ->where('id_kelompok', $kelompok_id)
-                    ->exists();
+            if ($mitra) {
+                
+                
 
-                $valid = $validKelompok;
-                $nama  = $mitra->nama_mitra;
-            } else {
-                $nama = '❌ MITRA / KELOMPOK TIDAK VALID';
-            }
+    if ($kelompok_id) {
+
+        $validKelompok = $mitra->kelompok()
+            ->where('id_kelompok', $kelompok_id)
+            ->exists();
+
+        $valid = $validKelompok;
+
+    } else {
+        $valid = true;
+    }
+
+    $nama = $mitra->nama_mitra;
+}
         }
 
         $rows[] = [
@@ -240,6 +261,8 @@ public function importPreview(Request $request)
             'nominal'       => $nominal,
             'potongan'      => $potongan,
             'bersih'        => $nominal - $potongan,
+            'kelompok_id'   => $data['kelompok_id'] ?? null,   // ⭐ TAMBAHKAN INI
+            'kelompok_nama' => $namaKelompok,             // ⭐ TAMBAHKAN INI
             'nama_bank'     => $data['nama_bank'] ?? '',
             'nama_rekening' => $data['nama_rekening'] ?? '',
             'no_rekening'   => preg_replace('/[^0-9]/', '', $data['no_rekening'] ?? ''),

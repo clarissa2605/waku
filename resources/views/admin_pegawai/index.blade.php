@@ -145,8 +145,7 @@
                             </span>
                         @else
                             <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-600">
-                                Belum Ada
-                            </span>
+                                Belum                            </span>
                         @endif
                     </td>
 
@@ -162,7 +161,7 @@
                         <button
                         onclick="resetPassword({{ $p->user->id }})"
                         class="px-3 py-1 text-xs rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 transition">
-                        Reset Password
+                        Reset 
                         </button>
 
                         @endif
@@ -170,7 +169,7 @@
                         @if(!$p->user)
                             <a href="{{ route('pegawai.user.create', $p->id_pegawai) }}"
                             class="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-200 transition">
-                            Buat Akun
+                            Buat 
                             </a>
                         @endif
 

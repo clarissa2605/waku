@@ -127,6 +127,12 @@
                     Tambah Mitra
                 </a>
 
+                <a href="{{ route('mitra.import.form') }}"
+                    class="block py-2
+                    {{ request()->routeIs('mitra.import.form') ? 'text-white font-medium' : 'text-blue-200 hover:text-white' }}">
+                    Import CSV Mitra
+                </a>
+
             </div>
 
         </div>

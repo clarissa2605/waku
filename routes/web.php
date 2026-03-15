@@ -147,6 +147,27 @@ Route::prefix('admin')
 
         Route::delete('kelompok/{kelompokId}/remove/{mitraId}', [KelompokMitraController::class, 'removeMitra'])
             ->name('kelompok.removeMitra');
+        
+        /*
+        |--------------------------------------------------------------------------
+        | IMPORT CSV MITRA
+        |--------------------------------------------------------------------------
+        */
+        Route::get('mitra/import', [MitraController::class, 'importForm'])
+            ->name('mitra.import.form');
+
+        Route::post('mitra/import', [MitraController::class, 'importCSV'])
+            ->name('mitra.import.csv');
+        
+        Route::get('mitra/template', [MitraController::class, 'downloadTemplate'])
+            ->name('mitra.template');
+        
+        Route::post('mitra/import/preview', [MitraController::class, 'importPreview'])
+            ->name('mitra.import.preview');
+
+        Route::post('mitra/import/confirm', [MitraController::class, 'importConfirm'])
+             ->name('mitra.import.confirm');
+
 
         /*
         |--------------------------------------------------------------------------

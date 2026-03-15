@@ -14,6 +14,30 @@
     </p>
 </div>
 
+{{-- ================= SUCCESS NOTIFICATION ================= --}}
+@if(session('success'))
+<div class="mb-6 border border-green-200 bg-green-50 rounded-lg p-4 flex justify-between items-center">
+
+    <div class="flex items-center gap-2 text-sm text-green-700">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-5 h-5"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7" />
+        </svg>
+
+        {{ session('success') }}
+
+    </div>
+
+</div>
+@endif
+
 <div class="bg-white border border-slate-200 rounded-lg p-6">
 
     {{-- ================= FILTER SECTION ================= --}}
@@ -175,5 +199,13 @@
     </div>
 
 </div>
+<script>
+setTimeout(function(){
+    let alert = document.querySelector('.bg-green-50');
+    if(alert){
+        alert.style.display = 'none';
+    }
+}, 3000);
+</script>
 
 @endsection

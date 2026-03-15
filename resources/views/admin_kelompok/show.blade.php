@@ -143,9 +143,11 @@
                                     @method('DELETE')
 
                                     <button type="submit"
-                                            class="font-semibold text-red-600 hover:text-red-800 transition">
-                                        Hapus
-                                    </button>
+                                        class="px-3 py-1 text-xs rounded-full
+                                            bg-red-100 text-red-600
+                                            hover:bg-red-200 transition">
+                                    Hapus
+                                </button>
                                 </form>
                             </div>
                         </td>
@@ -169,12 +171,22 @@
     <!-- Tambah Anggota -->
     <div class="bg-white border border-slate-200 rounded-lg p-6">
 
-        <button onclick="toggleForm()"
-                class="inline-flex items-center gap-2 px-4 py-2.5
-                       bg-blue-600 text-white text-sm font-medium
-                       rounded-lg hover:bg-blue-700 transition">
-            ➕ Tambah Anggota
-        </button>
+        <div class="flex justify-between items-center mb-4">
+
+    <!-- Kembali -->
+    <a href="{{ route('kelompok.index') }}"
+       class="text-sm text-slate-500 hover:text-blue-600 transition">
+        ← Kembali ke List Kelompok
+    </a>
+
+    <!-- Tambah -->
+    <button onclick="toggleForm()"
+            class="inline-flex items-center gap-2 px-4 py-2.5
+                   bg-blue-600 text-white text-sm font-medium
+                   rounded-lg hover:bg-blue-700 transition">
+        Tambah Anggota
+    </button>
+</div>
 
         <div id="formTambah" class="hidden mt-6 max-w-md">
 

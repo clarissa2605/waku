@@ -79,11 +79,12 @@
                         Nomor WhatsApp
                     </label>
                     <input type="text"
-                           value="{{ $pegawai->no_whatsapp }}"
-                           readonly
-                           class="w-full bg-slate-100 border border-slate-200 rounded-md px-4 py-2 text-sm text-slate-500 cursor-not-allowed">
+                        name="no_whatsapp"
+                        value="{{ old('no_whatsapp', $pegawai->no_whatsapp) }}"
+                        class="w-full border border-slate-200 rounded-md px-4 py-2 text-sm
+                        focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <p class="text-xs text-slate-400 mt-1">
-                        Hubungi admin jika ingin mengubah nomor WhatsApp.
+                    Gunakan format 628xxxxxxxx
                     </p>
                 </div>
 

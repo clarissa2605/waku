@@ -121,7 +121,7 @@
             <div class="border-t border-slate-200 pt-6 flex items-center justify-between">
 
                 <!-- Cancel -->
-                <a href="{{ route('kelompok.show', $kelompok->id_kelompok) }}"
+                <a href="{{ route('kelompok.index') }}"
                    class="text-sm text-slate-500 hover:text-blue-600 transition">
                     ← Batal & Kembali
                 </a>

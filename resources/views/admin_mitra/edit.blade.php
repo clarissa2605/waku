@@ -60,15 +60,21 @@
             </label>
 
             <input type="text"
-                   value="{{ $mitra->no_whatsapp }}"
-                   class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-slate-100 text-slate-500"
-                   readonly>
-
-            <input type="hidden" name="no_whatsapp" value="{{ $mitra->no_whatsapp }}">
+                name="no_whatsapp"
+                value="{{ old('no_whatsapp', $mitra->no_whatsapp) }}"
+                placeholder="628xxxxxxxx"
+                class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm
+                        focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
 
             <p class="text-xs text-slate-500 mt-1">
-                Nomor WhatsApp terdaftar sebagai kanal notifikasi resmi sistem.
+                Gunakan format 628xxxxxxxx
             </p>
+                {{-- ERROR MESSAGE --}}
+    @error('no_whatsapp')
+        <p class="text-red-500 text-xs mt-1">
+            {{ $message }}
+        </p>
+    @enderror
         </div>
 
         {{-- ALAMAT --}}
