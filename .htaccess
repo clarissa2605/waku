@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Protect Sensitive Files
+<FilesMatch "^\.|\.env|composer\.json|composer\.lock|package\.json|package-lock\.json">
+    Require all denied
+</FilesMatch>
