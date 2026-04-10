@@ -150,9 +150,9 @@ public function index(Request $request)
     'Pencairan dana untuk '.$pegawai->nama.' sebesar Rp '.number_format($nominal,0,',','.')
 );
 
-        // Generate pesan WA
-        $pesanWa = WhatsAppTemplate::pencairanDana($pencairan);
-        // logger($pesanWa);
+        // Generate pesan WA dan otomatis antrikan
+        $pencairan->update(['status_notifikasi' => 'diproses']);
+        KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
 
         return redirect()
     ->route('pencairan.create')
@@ -306,7 +306,7 @@ public function importConfirm(Request $request)
                     continue;
                 }
 
-                PencairanDana::create([
+                $pencairan = PencairanDana::create([
                     'pegawai_id'     => $pegawai->id_pegawai,
                     'nama_bank'      => $item['nama_bank'] ?? null,
                     'nama_rekening'  => $item['nama_rekening'] ?? null,
@@ -317,8 +317,9 @@ public function importConfirm(Request $request)
                     'potongan'       => $potongan,
                     'nominal_bersih' => $bersih,
                     'keterangan'     => $item['keterangan'] ?? null,
-                    'status_notifikasi' => 'belum',
+                    'status_notifikasi' => 'diproses',
                 ]);
+                KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
 
             } else {
 
@@ -330,7 +331,7 @@ public function importConfirm(Request $request)
                     continue;
                 }
 
-                PencairanDanaMitra::create([
+                $pencairan = PencairanDanaMitra::create([
                     'mitra_id'       => $mitra->id_mitra,
                     'kelompok_id'    => $item['kelompok_id'] ?? null,
                     'nama_bank'      => $item['nama_bank'] ?? null,
@@ -342,8 +343,9 @@ public function importConfirm(Request $request)
                     'potongan'       => $potongan,
                     'nominal_bersih' => $bersih,
                     'keterangan'     => $item['keterangan'] ?? null,
-                    'status_notifikasi' => 'belum',
+                    'status_notifikasi' => 'diproses',
                 ]);
+                KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
             }
         }
 
