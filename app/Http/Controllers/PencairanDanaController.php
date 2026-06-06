@@ -139,6 +139,12 @@ public function index(Request $request)
         $potongan = $request->input('potongan', 0);
         $bersih   = $nominal - $potongan;
 
+            if ($bersih < 0) {
+        return back()->withErrors([
+            'potongan' => 'Potongan tidak boleh lebih besar dari nominal.'
+        ])->withInput();
+    }
+
         $pencairan = PencairanDana::create([
             'pegawai_id'     => $pegawai->id_pegawai,
 
@@ -317,6 +323,10 @@ public function importConfirm(Request $request)
             $nominal  = (int) $item['nominal'];
             $potongan = (int) ($item['potongan'] ?? 0);
             $bersih   = $nominal - $potongan;
+
+            if ($bersih < 0) {
+                continue;
+            }
 
             if ($mode === 'pegawai') {
 
