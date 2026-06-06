@@ -126,25 +126,16 @@
 
 </div>
 
-@push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+const password = document.getElementById('password');
+const toggle = document.getElementById('togglePassword');
 
-    const password = document.getElementById('password');
-    const toggle = document.getElementById('togglePassword');
-
-    toggle.addEventListener('click', function () {
-
-        if (password.type === 'password') {
-            password.type = 'text';
-        } else {
-            password.type = 'password';
-        }
-
-    });
-
+toggle.addEventListener('click', function () {
+    password.type =
+        password.type === 'password'
+            ? 'text'
+            : 'password';
 });
 </script>
-@endpush
 
 @endsection
