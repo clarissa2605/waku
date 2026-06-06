@@ -108,8 +108,29 @@ Secure Internal System
 <form method="POST" action="{{ url('/login') }}">
 @csrf
 
+@if ($errors->any())
+    <div class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
+        <div class="flex items-start gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="w-5 h-5 text-red-500 mt-0.5"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="2"
+                 stroke="currentColor">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 9v3.75m0 3.75h.007M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+
+            <p class="text-sm text-red-700">
+                Login gagal. Silakan periksa kembali email dan password yang Anda masukkan.
+            </p>
+        </div>
+    </div>
+@endif
 
 <div class="mb-5">
+
 
 <label class="block text-sm font-medium text-slate-700 mb-2">
 Email
@@ -161,11 +182,38 @@ d="M16.5 10.5V7.875a4.125 4.125 0 10-8.25 0V10.5m-1.5 0h11.25A2.25 2.25 0 0120.2
 </svg>
 
 <input
+id="password"
 type="password"
 name="password"
 required
-class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg
+class="w-full pl-10 pr-12 py-3 border border-slate-300 rounded-lg
 focus:outline-none focus:ring-2 focus:ring-[#01214d]">
+
+<button
+type="button"
+id="togglePassword"
+class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+<svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg"
+class="w-5 h-5"
+fill="none"
+viewBox="0 0 24 24"
+stroke-width="1.8"
+stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round"
+d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+<circle cx="12" cy="12" r="3"/>
+</svg>
+
+<svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg"
+class="w-5 h-5 hidden"
+fill="none"
+viewBox="0 0 24 24"
+stroke-width="1.8"
+stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round"
+d="M3 3l18 18M10.584 10.587A2 2 0 0012 14a2 2 0 001.414-.586M9.88 5.09A10.958 10.958 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.48 10.48 0 01-4.293 5.568M6.228 6.228A10.45 10.45 0 002.458 12c1.274 4.057 5.064 7 9.542 7a10.96 10.96 0 005.772-1.647"/>
+</svg>
+</button>
 
 </div>
 
@@ -208,6 +256,29 @@ Sign In
 
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const eyeOpen = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+
+    togglePassword.addEventListener('click', function () {
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeOpen.classList.add('hidden');
+            eyeClosed.classList.remove('hidden');
+        } else {
+            passwordInput.type = 'password';
+            eyeOpen.classList.remove('hidden');
+            eyeClosed.classList.add('hidden');
+        }
+
+    });
+
+});
+</script>
 
 </x-guest-layout>

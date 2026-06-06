@@ -145,11 +145,7 @@
                             </td>
 
                             <td class="px-6 py-4 font-medium text-slate-800">
-                                @if(request('mode') === 'mitra')
-                                    {{ $p->mitra->nama_mitra ?? '-' }}
-                                @else
-                                    {{ $p->pegawai->nama ?? '-' }}
-                                @endif
+                                {{ $p->mitra->nama_mitra ?? $p->pegawai->nama ?? '-' }}
                             </td>
 
                             <td class="px-6 py-4 text-slate-600">

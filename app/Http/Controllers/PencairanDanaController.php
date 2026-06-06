@@ -22,19 +22,41 @@ class PencairanDanaController extends Controller
      * ========================================================= */
 public function index(Request $request)
 {
-    $mode = $request->mode ?? 'pegawai';
+    $mode = $request->mode;
 
+    // MODE SEMUA
+    if (empty($mode)) {
+
+        $pegawai = PencairanDana::with('pegawai')->get();
+
+        $mitra = PencairanDanaMitra::with(['mitra.kelompok'])->get();
+
+        $pencairan = $pegawai
+            ->concat($mitra)
+            ->sortByDesc('tanggal')
+            ->values();
+
+        $kelompokList = \App\Models\KelompokMitra::orderBy('nama_kelompok')->get();
+
+        return view('admin_pencairan.index', compact(
+            'pencairan',
+            'mode',
+            'kelompokList'
+        ));
+    }
+
+    // MODE MITRA
     if ($mode === 'mitra') {
 
         $query = PencairanDanaMitra::with(['mitra.kelompok']);
 
-        // filter kelompok hanya untuk mitra
         if ($request->kelompok) {
             $query->where('kelompok_id', $request->kelompok);
         }
 
     } else {
 
+        // MODE PEGAWAI
         $query = PencairanDana::with('pegawai');
     }
 
