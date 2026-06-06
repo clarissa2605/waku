@@ -67,11 +67,40 @@
             <label class="block text-sm font-medium text-slate-700 mb-2">
                 Password
             </label>
-            <input type="password"
-                   name="password"
-                   required
-                   class="w-full border border-slate-200 rounded-md px-4 py-2 text-sm
-                          focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+            <div class="relative">
+                <input type="password"
+                    id="password"
+                    name="password"
+                    required
+                    class="w-full border border-slate-200 rounded-md px-4 py-2 pr-12 text-sm
+                            focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+                <button type="button"
+                        id="togglePassword"
+                        class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600">
+                    <svg id="eyeIcon"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5">
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M2.036 12.322a1.012 1.012 0 010-.644
+                                C3.423 7.51 7.36 4.5 12 4.5
+                                c4.638 0 8.573 3.007 9.963 7.178
+                                .07.207.07.431 0 .644
+                                C20.577 16.49 16.64 19.5 12 19.5
+                                c-4.638 0-8.573-3.007-9.964-7.178z" />
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </div>
+
             <p class="text-xs text-slate-400 mt-1">
                 Pastikan password minimal 8 karakter.
             </p>
@@ -96,5 +125,26 @@
     </form>
 
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const password = document.getElementById('password');
+    const toggle = document.getElementById('togglePassword');
+
+    toggle.addEventListener('click', function () {
+
+        if (password.type === 'password') {
+            password.type = 'text';
+        } else {
+            password.type = 'password';
+        }
+
+    });
+
+});
+</script>
+@endpush
 
 @endsection
