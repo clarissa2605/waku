@@ -73,10 +73,8 @@ public function create()
         'no_rekening'    => $validated['no_rekening'],
 
         'keterangan'     => $validated['keterangan'],
-        'status_notifikasi' => 'diproses'
+        'status_notifikasi' => 'belum'
     ]);
-
-    \App\Jobs\KirimWhatsAppJob::dispatch($pencairan->id_pencairan);
 
     LogHelper::simpan(
     'Input Pencairan Mitra',
